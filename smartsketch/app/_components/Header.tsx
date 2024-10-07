@@ -76,13 +76,20 @@ function Header() {
 
           <div className="flex items-center gap-4">
             <div className="sm:flex sm:gap-4">
-              <a className="block rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700">
-                <LoginLink>Login</LoginLink>
-              </a>
+              <div className="flex items-center gap-4">
+                <div className="sm:flex sm:gap-4">
+                  <LoginLink
+                    postLoginRedirectURL="/dashboard"
+                    className="block rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700"
+                  >
+                    Login
+                  </LoginLink>
 
-              <a className="hidden rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium shadow text-teal-600 transition hover:text-teal-600/75 sm:block">
-                <RegisterLink>Register</RegisterLink>
-              </a>
+                  <RegisterLink className="hidden rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium shadow text-teal-600 transition hover:text-teal-600/75 sm:block">
+                    Register
+                  </RegisterLink>
+                </div>
+              </div>
             </div>
 
             <button className="block rounded bg-gray-100 p-2.5 text-gray-600 transition hover:text-gray-600/75 md:hidden">
