@@ -24,7 +24,7 @@ const DiagramNavbar: React.FC = () => {
         </div>
 
         {/* Second Row: Menu */}
-        <div className="flex items-center justify-between px-4 py-1 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between px-4 py-1 sm:px-6 lg:px-8 ">
           <nav className="flex px-6 items-center gap-6 text-sm text-gray-700">
             <a href="#" className="hover:text-teal-600">
               File
@@ -88,6 +88,7 @@ const DiagramNavbar: React.FC = () => {
         </button>
         {/* Add more buttons/icons as needed */}
       </div>
+      <hr className="border-gray-300" />
     </header>
   );
 };
