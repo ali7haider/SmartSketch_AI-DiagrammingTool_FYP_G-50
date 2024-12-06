@@ -12,7 +12,7 @@ export default function Home() {
   useEffect(() => {
     console.log("User:", user);
     // Redirect to the dashboard page initially
-    router.push("/workspace/"+2);
+    router.push("/dashboard/");
   }, [router]);
 
   return (
