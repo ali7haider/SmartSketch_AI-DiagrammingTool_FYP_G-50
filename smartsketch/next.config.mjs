@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+    images: {
+        domains: ['lh3.googleusercontent.com','gravatar.com'], // Add the hostname here
+      },
+};
+
+
 
 export default nextConfig;
