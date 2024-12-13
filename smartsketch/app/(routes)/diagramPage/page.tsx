@@ -1,6 +1,6 @@
 "use client";
-import DiagramNavbar from "@/app/_components/DiagramNavbar";
-import DiagramLeftSidebar from "@/app/_components/DiagramLeftSidebar"; // Import the left sidebar component
+import DiagramNavbar from "@/app/(routes)/workspace/_components/DiagramNavbar";
+import DiagramLeftSidebar from "@/app/(routes)/workspace/_components/DiagramLeftSidebar"; // Import the left sidebar component
 import React from "react";
 
 const DiagramPage: React.FC = () => {

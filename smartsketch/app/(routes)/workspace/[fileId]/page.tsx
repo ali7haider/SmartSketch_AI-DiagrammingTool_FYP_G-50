@@ -6,6 +6,7 @@ import WorkSpaceHeader from '../_components/WorkSpaceHeader';
 // import { api } from '@/convex/_generated/api';
 // import { FILE } from '../../dashboard/_components/FileList';
 import Canvas from '../_components/Canvas';
+import DiagramLeftSidebar from '../_components/DiagramLeftSidebar';
 
 function Workspace({params}:any) {
    const [triggerSave,setTriggerSave]=useState(false);
@@ -24,6 +25,11 @@ function Workspace({params}:any) {
     // const result=await convex.query(api.files.getFileById,{_id:params.fileId})
     // setFileData(result);
   }
+  // Define the onAICreate function
+  const onAICreate = () => {
+    console.log('AI Create button clicked');
+    // Your logic for creating diagram with AI
+  };
   return (
     <div className="p-0">
       <WorkSpaceHeader className="p-0" onSave={()=>setTriggerSave(!triggerSave)} />
@@ -31,9 +37,10 @@ function Workspace({params}:any) {
       {/* Workspace Layout  */}
       <div className='grid grid-cols-12'>
         {/* Side Panel (25%) */}
-        <div className='col-span-3 h-screen border-r'>
-          <h3>Side Panel</h3>
-        </div>
+        <DiagramLeftSidebar onAICreate={onAICreate} className='col-span-3 h-screen border-r'/>
+        {/* <aside >
+        </aside> */}
+        
 
         {/* Whiteboard/Canvas (50%) */}
         <div className='col-span-6 h-screen border-l border-r'>
