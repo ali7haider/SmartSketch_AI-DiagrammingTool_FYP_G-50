@@ -36,10 +36,10 @@ function Workspace({params}:any) {
 
       {/* Workspace Layout  */}
       <div className='grid grid-cols-12'>
-        {/* Side Panel (25%) */}
-        <DiagramLeftSidebar onAICreate={onAICreate} className='col-span-3 h-screen border-r'/>
-        {/* <aside >
-        </aside> */}
+        {/* Left Side Panel (25%) */}
+        <div className='col-span-3 h-screen border-l'>
+          <h3>Left Side Panel</h3>
+        </div>
         
 
         {/* Whiteboard/Canvas (50%) */}
@@ -52,9 +52,10 @@ function Workspace({params}:any) {
         </div>
 
         {/* Right Side Panel (25%) */}
-        <div className='col-span-3 h-screen border-l'>
-          <h3>Right Side Panel</h3>
-        </div>
+        <DiagramLeftSidebar onAICreate={onAICreate} className='col-span-3 h-screen border-r'/>
+        {/* <aside >
+        </aside> */}
+        
       </div>
 
     </div>
