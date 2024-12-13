@@ -3,10 +3,11 @@ import DiagramNavbar from "@/app/_components/DiagramNavbar";
 import DiagramLeftSidebar from "@/app/_components/DiagramLeftSidebar"; // Import the left sidebar component
 import React from "react";
 
-function Canvas() {
+const DiagramPage: React.FC = () => {
   const handleAICreate = () => {
     alert("AI Diagram Creation Coming Soon!"); // Replace with actual logic for AI diagram creation
   };
+
   return (
     <div className="flex flex-col h-screen">
       {/* Navbar Section */}
@@ -35,7 +36,7 @@ function Canvas() {
         </aside>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Canvas
+export default DiagramPage;
