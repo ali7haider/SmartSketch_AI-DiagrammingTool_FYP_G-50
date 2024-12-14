@@ -11,7 +11,7 @@ function Header() {
       <div className="mx-auto flex h-16 max-w-screen-xl items-center gap-8 px-4 sm:px-6 lg:px-8">
         <a href="#" className="block text-teal-600">
           <span className="sr-only">SmartSketch</span>
-          <Image src="/logo1.png" alt="logo" width={150} height={150} />
+          <Image src="/images/logo.png" alt="logo" width={30} height={30} />
         </a>
 
         <div className="flex flex-1 items-center justify-end md:justify-between">

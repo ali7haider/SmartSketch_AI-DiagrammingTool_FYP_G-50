@@ -7,6 +7,7 @@ import WorkSpaceHeader from "../_components/WorkSpaceHeader";
 // import { FILE } from '../../dashboard/_components/FileList';
 import Canvas from "../_components/Canvas";
 import DiagramLeftSidebar from "../_components/DiagramLeftSidebar";
+import DiagramRightSidebar from "../_components/DiagramRightSidebar";
 
 function Workspace({ params }: any) {
   const [triggerSave, setTriggerSave] = useState(false);
@@ -41,7 +42,10 @@ function Workspace({ params }: any) {
       <div className="grid grid-cols-12">
         {/* Left Side Panel (25%) */}
         <div className="col-span-2 h-screen border-l">
-          <h3>Left Side Panel</h3>
+          <DiagramLeftSidebar
+            onAICreate={onAICreate}
+            className="col-span-2 h-screen border-r"
+          />{" "}
         </div>
 
         {/* Whiteboard/Canvas (50%) */}
@@ -54,7 +58,7 @@ function Workspace({ params }: any) {
         </div>
 
         {/* Right Side Panel (25%) */}
-        <DiagramLeftSidebar
+        <DiagramRightSidebar
           onAICreate={onAICreate}
           className="col-span-2 h-screen border-r"
         />
