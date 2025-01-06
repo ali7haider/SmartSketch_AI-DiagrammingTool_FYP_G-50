@@ -3,10 +3,6 @@ import React, { useState } from "react";
 import { Stage, Layer, Rect, Line } from "react-konva"; // Import Konva components
 
 const Canvas: React.FC = () => {
-  const [rectangles, setRectangles] = useState<any[]>([
-    { x: 100, y: 100, width: 100, height: 100, fill: "red", id: "rect1" },
-  ]);
-
   const gridSize = 40; // Size of each grid square (box)
   const gridLines = 20; // Number of grid lines for both x and y axis
 
@@ -36,36 +32,12 @@ const Canvas: React.FC = () => {
     );
   }
 
-  const handleRectClick = (id: string) => {
-    alert(`Rectangle with ID ${id} clicked!`);
-  };
-
   return (
     <div className="w-full h-full flex justify-center items-center">
       <Stage width={800} height={600}>
         <Layer>
           {/* Render Grid Lines */}
           {gridLinesArray}
-
-          {/* Render rectangles from state */}
-          {rectangles.map((rect, index) => (
-            <Rect
-              key={index}
-              {...rect}
-              draggable
-              onClick={() => handleRectClick(rect.id)} // Add event handler on click
-              onDragEnd={(e) => {
-                const newRects = rectangles.map((r) => {
-                  if (r.id === rect.id) {
-                    r.x = e.target.x();
-                    r.y = e.target.y();
-                  }
-                  return r;
-                });
-                setRectangles(newRects);
-              }}
-            />
-          ))}
         </Layer>
       </Stage>
     </div>
