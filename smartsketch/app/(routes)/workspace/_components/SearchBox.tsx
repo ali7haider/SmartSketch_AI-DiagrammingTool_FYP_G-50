@@ -25,7 +25,7 @@ const SearchBox: React.FC = () => {
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="w-full h-8 pl-2 pr-8 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+        className="w-full h-8 pl-2 pr-8 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:border-gray-400"
       />
       <span
         className="absolute inset-y-0 right-2 flex items-center cursor-pointer"
