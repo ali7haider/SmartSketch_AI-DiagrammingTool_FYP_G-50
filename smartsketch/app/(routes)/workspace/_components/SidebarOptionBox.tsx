@@ -376,6 +376,59 @@ const SidebarOptionBox: React.FC = () => {
         },
       ],
     },
+    {
+      title: "UML",
+      shapes: [
+        {
+          label: "Object",
+          svg: (
+            <svg
+              style={{
+                width: "32px",
+                height: "30px",
+                display: "block",
+                position: "relative",
+                pointerEvents: "none",
+              }}
+            >
+              <rect
+                x="1.15"
+                y="8.25"
+                width="29.7"
+                height="13.5"
+                fill="#f1f3f4"
+                stroke="#000000"
+                strokeWidth="1.3"
+              />
+            </svg>
+          ),
+        },
+        {
+          label: "Interface",
+          svg: (
+            <svg
+              style={{
+                width: "32px",
+                height: "30px",
+                display: "block",
+                position: "relative",
+                pointerEvents: "none",
+              }}
+            >
+              <rect
+                x="1.15"
+                y="8.25"
+                width="29.7"
+                height="13.5"
+                fill="#f1f3f4"
+                stroke="#000000"
+                strokeWidth="1.3"
+              />
+            </svg>
+          ),
+        },
+      ],
+    },
   ];
 
   return (
