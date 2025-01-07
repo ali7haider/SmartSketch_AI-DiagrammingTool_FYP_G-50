@@ -39,13 +39,13 @@ function Workspace({ params }: any) {
       />
 
       {/* Workspace Layout  */}
-      <div className="grid grid-cols-12">
+      <div className="grid grid-cols-12 relative">
         {/* Left Side Panel (25%) */}
-        <div className="col-span-2 h-screen border-l">
+        <div className="col-span-2 h-screen border-l relative z-10">
           <DiagramLeftSidebar
             onAICreate={onAICreate}
             className="col-span-2 h-screen border-r"
-          />{" "}
+          />
         </div>
 
         {/* Whiteboard/Canvas (50%) */}

@@ -19,6 +19,7 @@ const DiagramLeftSidebar: React.FC<DiagramLeftSidebarProps> = ({
   return (
     <div
       className={`bg-gray-100 border-r border-gray-300 h-full flex flex-col p-3 ${className}`}
+      style={{ overflow: "visible" }} // Allow hover popup to overflow
     >
       <div className="mb-4 relative">
         <SearchBox />
