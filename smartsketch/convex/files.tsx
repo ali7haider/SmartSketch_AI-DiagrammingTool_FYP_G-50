@@ -8,10 +8,11 @@ export const createFile=mutation({
         createdBy:v.string(),
         archive:v.boolean(),
         document:v.string(),
-        whiteboard:v.string()
+        whiteboard:v.string(),
+        createdAt: v.number(), 
     },
-    handler:async(ctx, args) =>{
-        const result=await ctx.db.insert('files',args);
+    handler: async (ctx, args) => {
+        const result = await ctx.db.insert('files', args);
         return result;
     },
 })
