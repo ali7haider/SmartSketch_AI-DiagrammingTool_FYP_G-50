@@ -1,13 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCaretRight,
-  faCaretDown,
-  faFont,
-  faHeading,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCaretRight, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { sections } from "./shapesConfig";
+
 const SidebarOptionBox: React.FC = () => {
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [hoveredShape, setHoveredShape] = useState<{
