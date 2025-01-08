@@ -1,9 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Link, Save } from "lucide-react";
-import Image from "next/image";
 import React from "react";
 
-function WorkspaceHeader({ onSave }: any) {
+const DiagramNavbar: React.FC = () => {
   return (
     <header className="bg-gray-100 border-b shadow-md">
       {/* Top Navbar */}
@@ -94,6 +91,6 @@ function WorkspaceHeader({ onSave }: any) {
       <hr className="border-gray-300" />
     </header>
   );
-}
+};
 
-export default WorkspaceHeader;
+export default DiagramNavbar;
