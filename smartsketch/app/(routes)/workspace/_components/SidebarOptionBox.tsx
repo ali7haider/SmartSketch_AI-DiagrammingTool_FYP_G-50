@@ -97,11 +97,18 @@ const SidebarOptionBox: React.FC<SidebarOptionBoxProps> = ({
               {/* Scale the icon dynamically */}
               {React.cloneElement(hoveredShape.icon, {
                 style: {
-                  width: "100%",
-                  height: "100%",
-                  maxWidth: "64px",
-                  maxHeight: "64px",
+                  width: "100%", // Ensure it scales to fill the container
+                  height: "100%", // Maintain aspect ratio
+                  maxWidth: "64px", // Set maximum width for scaling
+                  maxHeight: "64px", // Set maximum height for scaling
                 },
+                children: React.Children.map(
+                  hoveredShape.icon.props.children,
+                  (child) =>
+                    React.cloneElement(child, {
+                      transform: "scale(2)", // Apply scaling to the rect or ellipse
+                    })
+                ),
               })}
             </div>
           </div>

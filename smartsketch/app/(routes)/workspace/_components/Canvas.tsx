@@ -29,7 +29,7 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
           points={[0, i * gridSize, width, i * gridSize]}
           stroke="black"
           strokeWidth={0.5}
-          opacity={0.2}
+          opacity={0.5}
         />
       );
     }
@@ -40,7 +40,7 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
           points={[i * gridSize, 0, i * gridSize, height]}
           stroke="black"
           strokeWidth={0.5}
-          opacity={0.2}
+          opacity={0.5}
         />
       );
     }
@@ -71,8 +71,17 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
           fill: "blue",
         },
       ]);
+    } else if (selectedShape === "Circle") {
+      const newShape = {
+        type: "Circle",
+        x: canvasWidth / 2,
+        y: canvasHeight / 2,
+        radius: 40,
+        fill: "red",
+      };
+      setShapes((prevShapes) => [...prevShapes, newShape]);
     }
-  }, [selectedShape]);
+  }, [selectedShape]); // This will add shapes on every shape selection
 
   const handleDragMove = (index: number, newX: number, newY: number) => {
     setShapes((prevShapes) => {
@@ -118,7 +127,6 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
         position: "relative",
         padding: `${padding}px`,
         boxSizing: "border-box",
-
         backgroundColor: "#FBFBFB",
       }}
     >
