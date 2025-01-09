@@ -1,7 +1,17 @@
+import { ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFont, faHeading } from "@fortawesome/free-solid-svg-icons";
 
-export const sections = [
+export interface Shape {
+  label: string;
+  svg: ReactNode; // Use ReactNode for JSX elements
+}
+
+export interface Section {
+  title: string;
+  shapes: Shape[];
+}
+export const sections: Section[] = [
   {
     title: "General",
     shapes: [

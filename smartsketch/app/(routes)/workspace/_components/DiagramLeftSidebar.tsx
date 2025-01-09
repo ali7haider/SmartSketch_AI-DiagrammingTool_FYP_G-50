@@ -2,28 +2,28 @@
 import React, { useState } from "react";
 import SearchBox from "./SearchBox";
 import SidebarOptionBox from "./SidebarOptionBox";
-// Define the type for the props
+
 interface DiagramLeftSidebarProps {
+  onShapeSelect: (shape: string) => void; // Notify parent about selected shape
   onAICreate: () => void;
-  className?: string; // Add className explicitly
+  className?: string;
 }
 
 const DiagramLeftSidebar: React.FC<DiagramLeftSidebarProps> = ({
+  onShapeSelect,
   onAICreate,
   className = "",
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("General");
-
-  const categories = ["General", "Misc", "Advanced", "Basic"];
-
   return (
     <div
       className={`bg-gray-100 border-r border-gray-300 h-full flex flex-col p-3 ${className}`}
-      style={{ overflow: "visible" }} // Allow hover popup to overflow
+      style={{ overflow: "visible" }}
     >
       <div className="mb-4 relative">
         <SearchBox />
-        <SidebarOptionBox />
+        <SidebarOptionBox
+          onShapeSelect={onShapeSelect} // Pass shape selection handler
+        />
       </div>
     </div>
   );

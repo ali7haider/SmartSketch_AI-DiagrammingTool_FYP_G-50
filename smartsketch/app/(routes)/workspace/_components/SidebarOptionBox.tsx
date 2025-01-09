@@ -2,9 +2,15 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretRight, faCaretDown } from "@fortawesome/free-solid-svg-icons";
-import { sections } from "./shapesConfig";
+import { sections } from "./shapesConfig"; // Import shapes configuration
 
-const SidebarOptionBox: React.FC = () => {
+interface SidebarOptionBoxProps {
+  onShapeSelect: (shape: string) => void; // Prop to notify parent about shape selection
+}
+
+const SidebarOptionBox: React.FC<SidebarOptionBoxProps> = ({
+  onShapeSelect,
+}) => {
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [hoveredShape, setHoveredShape] = useState<{
     icon: JSX.Element;
@@ -38,17 +44,21 @@ const SidebarOptionBox: React.FC = () => {
               {section.shapes.map((shape, index) => (
                 <div
                   key={index}
-                  className="geItem flex items-center justify-centercursor-pointer p-1 hover:bg-gray-200 relative"
+                  className="geItem flex items-center justify-center cursor-pointer p-1 hover:bg-gray-200 relative"
                   style={{ width: "40px", height: "32px" }}
                   onMouseEnter={() => {
                     if (!hoveredShape || hoveredShape.label !== shape.label) {
                       setHoveredShape({
-                        icon: shape.svg,
+                        icon: shape.svg as React.ReactElement,
                         label: shape.label,
                       });
                     }
                   }}
                   onMouseLeave={() => setHoveredShape(null)}
+                  onClick={() => {
+                    onShapeSelect(shape.label); // Notify parent about selected shape
+                    setHoveredShape(null); // Reset hover state
+                  }}
                 >
                   {shape.svg}
                 </div>
@@ -64,10 +74,10 @@ const SidebarOptionBox: React.FC = () => {
       {/* Hover Popup */}
       {hoveredShape && (
         <div
-          className="absolute p-2 bg-white border border-gray-300 rounded shadow-lg z-50" // Increased z-index for proper stacking
+          className="absolute p-2 bg-white border border-gray-300 rounded shadow-lg z-50"
           style={{
             top: "50%",
-            left: "calc(100% + 10px)", // Positioned outside the sidebar with a small gap
+            left: "calc(100% + 10px)",
             transform: "translateY(-50%)",
             width: "150px",
             textAlign: "center",
@@ -79,25 +89,19 @@ const SidebarOptionBox: React.FC = () => {
               style={{
                 width: "64px",
                 height: "64px",
-                display: "flex", // Ensures proper alignment
+                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
+              {/* Scale the icon dynamically */}
               {React.cloneElement(hoveredShape.icon, {
                 style: {
-                  width: "100%", // Ensure it scales to fill the container
-                  height: "100%", // Maintain aspect ratio
-                  maxWidth: "64px", // Set maximum width for scaling
-                  maxHeight: "64px", // Set maximum height for scaling
+                  width: "100%",
+                  height: "100%",
+                  maxWidth: "64px",
+                  maxHeight: "64px",
                 },
-                children: React.Children.map(
-                  hoveredShape.icon.props.children,
-                  (child) =>
-                    React.cloneElement(child, {
-                      transform: "scale(2)", // Apply scaling to the rect or ellipse
-                    })
-                ),
               })}
             </div>
           </div>
