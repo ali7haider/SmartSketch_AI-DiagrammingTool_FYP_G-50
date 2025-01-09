@@ -5,13 +5,11 @@ import SidebarOptionBox from "./SidebarOptionBox";
 
 interface DiagramLeftSidebarProps {
   onShapeSelect: (shape: string) => void; // Notify parent about selected shape
-  onAICreate: () => void;
   className?: string;
 }
 
 const DiagramLeftSidebar: React.FC<DiagramLeftSidebarProps> = ({
   onShapeSelect,
-  onAICreate,
   className = "",
 }) => {
   return (

@@ -2,8 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Link, Save } from "lucide-react";
 import Image from "next/image";
 import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearchPlus, faSearchMinus } from "@fortawesome/free-solid-svg-icons";
 
-function WorkspaceHeader({ onSave }: any) {
+interface WorkspaceHeaderProps {
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+}
+const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
+  onZoomIn,
+  onZoomOut,
+}) => {
   return (
     <header className="bg-gray-100 border-b shadow-md">
       {/* Top Navbar */}
@@ -55,45 +64,26 @@ function WorkspaceHeader({ onSave }: any) {
       {/* Bottom Navbar: Icons Section */}
       <div className="flex overflow-x-auto items-center gap-4 px-4 py-2 sm:px-6 lg:px-8">
         {/* Example Icons */}
-        <button className="text-gray-600 hover:text-teal-600">
-          <span className="sr-only">Tool 1</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 6v6l4 2"
-            />
-          </svg>
+        <button
+          className="text-gray-600 hover:text-teal-600"
+          onClick={onZoomIn}
+        >
+          <span className="sr-only">Zoom In</span>
+          <FontAwesomeIcon icon={faSearchPlus} className="h-5 w-5" />
         </button>
-        <button className="text-gray-600 hover:text-teal-600">
-          <span className="sr-only">Tool 2</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
+        {/* Zoom Out Button */}
+        <button
+          className="text-gray-600 hover:text-teal-600"
+          onClick={onZoomOut}
+        >
+          <span className="sr-only">Zoom Out</span>
+          <FontAwesomeIcon icon={faSearchMinus} className="h-5 w-5" />
         </button>
         {/* Add more buttons/icons as needed */}
       </div>
       <hr className="border-gray-300" />
     </header>
   );
-}
+};
 
 export default WorkspaceHeader;

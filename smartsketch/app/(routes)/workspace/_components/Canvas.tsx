@@ -1,67 +1,64 @@
-"use client";
+// Canvas Component
 import React, { useState, useEffect } from "react";
-import { Stage, Layer, Line, Rect, Circle } from "react-konva"; // Import Konva components
+import { Stage, Layer, Line, Rect, Circle } from "react-konva";
 
 interface CanvasProps {
-  selectedShape: string | null; // Prop to receive the selected shape
+  selectedShape: string | null;
+  zoom: number; // Zoom level passed as prop
+  setZoom: React.Dispatch<React.SetStateAction<number>>; // Set zoom function passed as prop
 }
 
-const Canvas: React.FC<CanvasProps> = ({ selectedShape }) => {
-  const gridSize = 40; // Size of each grid square (box)
-  const gridLines = 20; // Number of grid lines for both x and y axis
+const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
+  const initialCanvasWidth = 800;
+  const initialCanvasHeight = 600;
+  const gridSize = 40;
+  const gridLines = 20;
 
-  // State to store drawn shapes
+  const [canvasWidth, setCanvasWidth] = useState(initialCanvasWidth);
+  const [canvasHeight, setCanvasHeight] = useState(initialCanvasHeight);
   const [shapes, setShapes] = useState<any[]>([]);
 
-  // Generate grid lines
   const gridLinesArray: JSX.Element[] = [];
   for (let i = 0; i < gridLines; i++) {
-    // Horizontal lines
     gridLinesArray.push(
       <Line
         key={`h-${i}`}
         points={[0, i * gridSize, gridLines * gridSize, i * gridSize]}
-        stroke="gray"
+        stroke="black"
         strokeWidth={1}
         opacity={0.2}
       />
     );
-    // Vertical lines
     gridLinesArray.push(
       <Line
         key={`v-${i}`}
         points={[i * gridSize, 0, i * gridSize, gridLines * gridSize]}
-        stroke="gray"
+        stroke="black"
         strokeWidth={1}
         opacity={0.2}
       />
     );
   }
 
-  // Add shape to canvas
   useEffect(() => {
     if (selectedShape === "Rectangle") {
-      const canvasWidth = 800; // Width of the canvas
-      const canvasHeight = 600; // Height of the canvas
-      const rectWidth = 100; // Width of the rectangle
-      const rectHeight = 50; // Height of the rectangle
+      const rectWidth = 100;
+      const rectHeight = 60;
 
-      // Add a rectangle to the shapes array
       setShapes((prevShapes) => [
         ...prevShapes,
         {
           type: "Rectangle",
-          x: canvasWidth / 2 - rectWidth / 2, // Centered horizontally
-          y: canvasHeight / 2 - rectHeight / 2, // Centered vertically
+          x: initialCanvasWidth / 2 - rectWidth / 2,
+          y: initialCanvasHeight / 2 - rectHeight / 2,
           width: rectWidth,
           height: rectHeight,
-          fill: "blue", // Default fill color
+          fill: "blue",
         },
       ]);
     }
   }, [selectedShape]);
 
-  // Handle shape movement
   const handleDragMove = (index: number, newX: number, newY: number) => {
     setShapes((prevShapes) => {
       const updatedShapes = [...prevShapes];
@@ -72,18 +69,33 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape }) => {
       };
       return updatedShapes;
     });
+
+    let newCanvasWidth = canvasWidth;
+    let newCanvasHeight = canvasHeight;
+
+    const shape = shapes[index];
+    if (shape.x + shape.width > newCanvasWidth) {
+      newCanvasWidth = shape.x + shape.width + 50;
+    }
+    if (shape.y + shape.height > newCanvasHeight) {
+      newCanvasHeight = shape.y + shape.height + 50;
+    }
+
+    setCanvasWidth(newCanvasWidth);
+    setCanvasHeight(newCanvasHeight);
   };
 
   return (
-    <div className="w-full h-full flex justify-center items-center">
-      <Stage width={800} height={600}>
+    <div className="w-full h-full flex justify-center items-center relative">
+      <Stage
+        width={canvasWidth}
+        height={canvasHeight}
+        scaleX={zoom}
+        scaleY={zoom}
+      >
         <Layer>
-          {/* Render Grid Lines */}
           {gridLinesArray}
-
-          {/* Render Shapes */}
           {shapes.map((shape, index) => {
-            console.log(shape.type);
             if (shape.type === "Rectangle") {
               return (
                 <Rect
@@ -100,7 +112,6 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape }) => {
                 />
               );
             }
-            // Add more shapes like Circle, Line etc. as needed
             if (shape.type === "Circle") {
               return (
                 <Circle
