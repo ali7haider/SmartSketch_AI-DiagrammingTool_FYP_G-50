@@ -1,4 +1,3 @@
-// Canvas Component
 import React, { useState, useEffect } from "react";
 import { Stage, Layer, Line, Rect, Circle } from "react-konva";
 
@@ -12,33 +11,49 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
   const initialCanvasWidth = 800;
   const initialCanvasHeight = 600;
   const gridSize = 40;
-  const gridLines = 20;
+  const padding = 50; // Padding around the canvas
 
   const [canvasWidth, setCanvasWidth] = useState(initialCanvasWidth);
   const [canvasHeight, setCanvasHeight] = useState(initialCanvasHeight);
   const [shapes, setShapes] = useState<any[]>([]);
 
-  const gridLinesArray: JSX.Element[] = [];
-  for (let i = 0; i < gridLines; i++) {
-    gridLinesArray.push(
-      <Line
-        key={`h-${i}`}
-        points={[0, i * gridSize, gridLines * gridSize, i * gridSize]}
-        stroke="black"
-        strokeWidth={1}
-        opacity={0.2}
-      />
-    );
-    gridLinesArray.push(
-      <Line
-        key={`v-${i}`}
-        points={[i * gridSize, 0, i * gridSize, gridLines * gridSize]}
-        stroke="black"
-        strokeWidth={1}
-        opacity={0.2}
-      />
-    );
-  }
+  const generateGridLines = (width: number, height: number): JSX.Element[] => {
+    const lines: JSX.Element[] = [];
+    const horizontalLines = Math.ceil(height / gridSize);
+    const verticalLines = Math.ceil(width / gridSize);
+
+    for (let i = 0; i <= horizontalLines; i++) {
+      lines.push(
+        <Line
+          key={`h-${i}`}
+          points={[0, i * gridSize, width, i * gridSize]}
+          stroke="black"
+          strokeWidth={0.5}
+          opacity={0.2}
+        />
+      );
+    }
+    for (let i = 0; i <= verticalLines; i++) {
+      lines.push(
+        <Line
+          key={`v-${i}`}
+          points={[i * gridSize, 0, i * gridSize, height]}
+          stroke="black"
+          strokeWidth={0.5}
+          opacity={0.2}
+        />
+      );
+    }
+    return lines;
+  };
+
+  const [gridLines, setGridLines] = useState(
+    generateGridLines(canvasWidth, canvasHeight)
+  );
+
+  useEffect(() => {
+    setGridLines(generateGridLines(canvasWidth, canvasHeight));
+  }, [canvasWidth, canvasHeight]);
 
   useEffect(() => {
     if (selectedShape === "Rectangle") {
@@ -49,8 +64,8 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
         ...prevShapes,
         {
           type: "Rectangle",
-          x: initialCanvasWidth / 2 - rectWidth / 2,
-          y: initialCanvasHeight / 2 - rectHeight / 2,
+          x: canvasWidth / 2 - rectWidth / 2,
+          y: canvasHeight / 2 - rectHeight / 2,
           width: rectWidth,
           height: rectHeight,
           fill: "blue",
@@ -74,11 +89,17 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
     let newCanvasHeight = canvasHeight;
 
     const shape = shapes[index];
-    if (shape.x + shape.width > newCanvasWidth) {
-      newCanvasWidth = shape.x + shape.width + 50;
+    if (shape.x + shape.width > canvasWidth) {
+      newCanvasWidth = shape.x + shape.width + padding;
     }
-    if (shape.y + shape.height > newCanvasHeight) {
-      newCanvasHeight = shape.y + shape.height + 50;
+    if (shape.x < 0) {
+      newCanvasWidth = canvasWidth + Math.abs(shape.x) + padding;
+    }
+    if (shape.y + shape.height > canvasHeight) {
+      newCanvasHeight = shape.y + shape.height + padding;
+    }
+    if (shape.y < 0) {
+      newCanvasHeight = canvasHeight + Math.abs(shape.y) + padding;
     }
 
     setCanvasWidth(newCanvasWidth);
@@ -86,51 +107,75 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
   };
 
   return (
-    <div className="w-full h-full flex justify-center items-center relative">
-      <Stage
-        width={canvasWidth}
-        height={canvasHeight}
-        scaleX={zoom}
-        scaleY={zoom}
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        overflow: "auto",
+        position: "relative",
+        padding: `${padding}px`,
+        boxSizing: "border-box",
+
+        backgroundColor: "#FBFBFB",
+      }}
+    >
+      <div
+        style={{
+          width: `${canvasWidth}px`,
+          height: `${canvasHeight}px`,
+          position: "relative",
+          backgroundColor: "#fff",
+        }}
       >
-        <Layer>
-          {gridLinesArray}
-          {shapes.map((shape, index) => {
-            if (shape.type === "Rectangle") {
-              return (
-                <Rect
-                  key={index}
-                  x={shape.x}
-                  y={shape.y}
-                  width={shape.width}
-                  height={shape.height}
-                  fill={shape.fill}
-                  draggable
-                  onDragMove={(e) => {
-                    handleDragMove(index, e.target.x(), e.target.y());
-                  }}
-                />
-              );
-            }
-            if (shape.type === "Circle") {
-              return (
-                <Circle
-                  key={index}
-                  x={shape.x}
-                  y={shape.y}
-                  radius={shape.radius}
-                  fill={shape.fill}
-                  draggable
-                  onDragMove={(e) => {
-                    handleDragMove(index, e.target.x(), e.target.y());
-                  }}
-                />
-              );
-            }
-            return null;
-          })}
-        </Layer>
-      </Stage>
+        <Stage
+          width={canvasWidth}
+          height={canvasHeight}
+          scaleX={zoom}
+          scaleY={zoom}
+          style={{ border: "1px solid #ccc" }}
+        >
+          <Layer>
+            {gridLines}
+            {shapes.map((shape, index) => {
+              if (shape.type === "Rectangle") {
+                return (
+                  <Rect
+                    key={index}
+                    x={shape.x}
+                    y={shape.y}
+                    width={shape.width}
+                    height={shape.height}
+                    fill={shape.fill}
+                    draggable
+                    onDragMove={(e) => {
+                      handleDragMove(index, e.target.x(), e.target.y());
+                    }}
+                  />
+                );
+              }
+              if (shape.type === "Circle") {
+                return (
+                  <Circle
+                    key={index}
+                    x={shape.x}
+                    y={shape.y}
+                    radius={shape.radius}
+                    fill={shape.fill}
+                    draggable
+                    onDragMove={(e) => {
+                      handleDragMove(index, e.target.x(), e.target.y());
+                    }}
+                  />
+                );
+              }
+              return null;
+            })}
+          </Layer>
+        </Stage>
+      </div>
     </div>
   );
 };
