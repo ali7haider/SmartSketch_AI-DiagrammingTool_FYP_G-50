@@ -50,7 +50,12 @@ const Workspace: React.FC = () => {
 
         {/* Whiteboard/Canvas */}
         <div className="col-span-8 h-screen border-l border-r">
-          <Canvas selectedShape={selectedShape} zoom={zoom} setZoom={setZoom} />
+          <Canvas
+            selectedShape={selectedShape}
+            setSelectedShape={setSelectedShape}
+            zoom={zoom}
+            setZoom={setZoom}
+          />
         </div>
 
         {/* Right Side Panel */}

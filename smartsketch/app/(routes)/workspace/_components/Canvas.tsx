@@ -5,9 +5,15 @@ interface CanvasProps {
   selectedShape: string | null;
   zoom: number; // Zoom level passed as prop
   setZoom: React.Dispatch<React.SetStateAction<number>>; // Set zoom function passed as prop
+  setSelectedShape: React.Dispatch<React.SetStateAction<string | null>>; // Reset selected shape
 }
 
-const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
+const Canvas: React.FC<CanvasProps> = ({
+  selectedShape,
+  zoom,
+  setZoom,
+  setSelectedShape,
+}) => {
   const initialCanvasWidth = 800;
   const initialCanvasHeight = 600;
   const gridSize = 40;
@@ -71,6 +77,7 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
           fill: "blue",
         },
       ]);
+      setSelectedShape(null); // Reset selected shape after adding
     } else if (selectedShape === "Circle") {
       const newShape = {
         type: "Circle",
@@ -80,8 +87,9 @@ const Canvas: React.FC<CanvasProps> = ({ selectedShape, zoom, setZoom }) => {
         fill: "red",
       };
       setShapes((prevShapes) => [...prevShapes, newShape]);
+      setSelectedShape(null); // Reset selected shape after adding
     }
-  }, [selectedShape]); // This will add shapes on every shape selection
+  }, [selectedShape, canvasWidth, canvasHeight, setSelectedShape]);
 
   const handleDragMove = (index: number, newX: number, newY: number) => {
     setShapes((prevShapes) => {
