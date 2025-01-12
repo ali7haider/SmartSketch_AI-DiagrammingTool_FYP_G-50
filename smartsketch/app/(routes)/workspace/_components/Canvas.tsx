@@ -62,6 +62,10 @@ const Canvas: React.FC<CanvasProps> = ({
   }, [canvasWidth, canvasHeight]);
 
   useEffect(() => {
+    const getRandomOffset = (range: number) => {
+      return Math.random() * range * 2 - range; // Random value between -range and +range
+    };
+
     if (selectedShape === "Rectangle") {
       const rectWidth = 100;
       const rectHeight = 60;
@@ -70,21 +74,25 @@ const Canvas: React.FC<CanvasProps> = ({
         ...prevShapes,
         {
           type: "Rectangle",
-          x: canvasWidth / 2 - rectWidth / 2,
-          y: canvasHeight / 2 - rectHeight / 2,
+          x: canvasWidth / 2 - rectWidth / 2 + getRandomOffset(50),
+          y: canvasHeight / 2 - rectHeight / 2 + getRandomOffset(50),
           width: rectWidth,
           height: rectHeight,
-          fill: "blue",
+          fill: "white", // Default fill color
+          stroke: "black", // Border color
+          strokeWidth: 1, // Border thickness
         },
       ]);
       setSelectedShape(null); // Reset selected shape after adding
     } else if (selectedShape === "Circle") {
       const newShape = {
         type: "Circle",
-        x: canvasWidth / 2,
-        y: canvasHeight / 2,
+        x: canvasWidth / 2 + getRandomOffset(50),
+        y: canvasHeight / 2 + getRandomOffset(50),
         radius: 40,
-        fill: "red",
+        fill: "white", // Default fill color
+        stroke: "black", // Border color
+        strokeWidth: 1, // Border thickness
       };
       setShapes((prevShapes) => [...prevShapes, newShape]);
       setSelectedShape(null); // Reset selected shape after adding
@@ -165,6 +173,8 @@ const Canvas: React.FC<CanvasProps> = ({
                     width={shape.width}
                     height={shape.height}
                     fill={shape.fill}
+                    stroke={shape.stroke} // Border color
+                    strokeWidth={shape.strokeWidth} // Border thickness
                     draggable
                     onDragMove={(e) => {
                       handleDragMove(index, e.target.x(), e.target.y());
@@ -180,6 +190,8 @@ const Canvas: React.FC<CanvasProps> = ({
                     y={shape.y}
                     radius={shape.radius}
                     fill={shape.fill}
+                    stroke={shape.stroke} // Border color
+                    strokeWidth={shape.strokeWidth} // Border thickness
                     draggable
                     onDragMove={(e) => {
                       handleDragMove(index, e.target.x(), e.target.y());
