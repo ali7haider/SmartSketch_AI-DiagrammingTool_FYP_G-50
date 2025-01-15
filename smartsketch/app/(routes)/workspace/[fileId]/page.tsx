@@ -11,6 +11,10 @@ const Workspace: React.FC = () => {
   const [selectedShape, setSelectedShape] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1); // Initialize zoom state
   const [triggerSave, setTriggerSave] = useState(false);
+  const convex = 1;
+  const [codeContent, setCodeContent] = useState<string>("{}");
+  //  const convex=useConvex();
+  const [fileData, setFileData] = useState<false>();
 
   const handleZoomIn = () => {
     setZoom((prevZoom) => Math.min(prevZoom + 0.1, 2)); // Limit zoom-in
@@ -29,8 +33,10 @@ const Workspace: React.FC = () => {
       return Math.max(newZoom, minZoom); // Limit zoom-out
     });
   };
-  const onAICreate = () => {
-    console.log("AI Create button clicked");
+  const onAICreate = (input: string) => {
+    console.log("AI Create button clicked with input:", input);
+    const generatedCode = `{"message": "Generated from AI: ${input}"}`; // Example AI logic
+    setCodeContent(generatedCode);
   };
 
   return (
@@ -49,7 +55,7 @@ const Workspace: React.FC = () => {
         </div>
 
         {/* Whiteboard/Canvas */}
-        <div className="col-span-8 h-screen border-l border-r">
+        <div className="col-span-7 h-screen border-l border-r">
           <Canvas
             selectedShape={selectedShape}
             setSelectedShape={setSelectedShape}
@@ -60,8 +66,14 @@ const Workspace: React.FC = () => {
 
         {/* Right Side Panel */}
         <DiagramRightSidebar
-          onAICreate={onAICreate}
-          className="col-span-2 h-screen border-r"
+          onAICreate={(input) => {
+            // Logic to handle AI input (generate JSON and update state)
+            const generatedCode = `{"message": "Generated from AI: ${input}"}`; // Example
+            setCodeContent(generatedCode);
+          }}
+          className="col-span-3 h-screen border-r"
+          codeContent={codeContent}
+          updateCode={(newCode) => setCodeContent(newCode)}
         />
       </div>
     </div>
