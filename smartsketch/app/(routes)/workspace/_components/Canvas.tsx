@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Stage, Layer, Line, Rect, Circle } from "react-konva";
+import { v4 as uuidv4 } from "uuid"; // <-- Install this package if not already: npm install uuid
 
 interface CanvasProps {
   selectedShape: string | null;
   zoom: number; // Zoom level passed as prop
   setZoom: React.Dispatch<React.SetStateAction<number>>; // Set zoom function passed as prop
-  setSelectedShape: React.Dispatch<React.SetStateAction<string | null>>; // Reset selected shape
+  setSelectedShape: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const Canvas: React.FC<CanvasProps> = ({
@@ -73,6 +74,7 @@ const Canvas: React.FC<CanvasProps> = ({
       setShapes((prevShapes) => [
         ...prevShapes,
         {
+          id: uuidv4(), // Assign unique id
           type: "Rectangle",
           x: canvasWidth / 2 - rectWidth / 2 + getRandomOffset(50),
           y: canvasHeight / 2 - rectHeight / 2 + getRandomOffset(50),
@@ -86,6 +88,7 @@ const Canvas: React.FC<CanvasProps> = ({
       setSelectedShape(null); // Reset selected shape after adding
     } else if (selectedShape === "Circle") {
       const newShape = {
+        id: uuidv4(), // Assign unique id
         type: "Circle",
         x: canvasWidth / 2 + getRandomOffset(50),
         y: canvasHeight / 2 + getRandomOffset(50),
@@ -98,7 +101,9 @@ const Canvas: React.FC<CanvasProps> = ({
       setSelectedShape(null); // Reset selected shape after adding
     }
   }, [selectedShape, canvasWidth, canvasHeight, setSelectedShape]);
-
+  const handleShapeClick = (id: string) => {
+    setSelectedShape(id); // Update selected shape on click
+  };
   const handleDragMove = (index: number, newX: number, newY: number) => {
     setShapes((prevShapes) => {
       const updatedShapes = [...prevShapes];
@@ -173,9 +178,12 @@ const Canvas: React.FC<CanvasProps> = ({
                     width={shape.width}
                     height={shape.height}
                     fill={shape.fill}
-                    stroke={shape.stroke} // Border color
-                    strokeWidth={shape.strokeWidth} // Border thickness
+                    stroke={shape.stroke}
+                    strokeWidth={
+                      selectedShape === shape.id ? 3 : shape.strokeWidth
+                    }
                     draggable
+                    onClick={() => handleShapeClick(shape.id)}
                     onDragMove={(e) => {
                       handleDragMove(index, e.target.x(), e.target.y());
                     }}
@@ -191,8 +199,11 @@ const Canvas: React.FC<CanvasProps> = ({
                     radius={shape.radius}
                     fill={shape.fill}
                     stroke={shape.stroke} // Border color
-                    strokeWidth={shape.strokeWidth} // Border thickness
+                    strokeWidth={
+                      selectedShape === shape.id ? 3 : shape.strokeWidth
+                    }
                     draggable
+                    onClick={() => handleShapeClick(shape.id)}
                     onDragMove={(e) => {
                       handleDragMove(index, e.target.x(), e.target.y());
                     }}

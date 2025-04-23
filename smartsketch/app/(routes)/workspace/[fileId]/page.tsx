@@ -42,7 +42,11 @@ const Workspace: React.FC = () => {
   return (
     <div className="p-0">
       {/* Workspace Header */}
-      <WorkSpaceHeader onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />
+      <WorkSpaceHeader
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onDelete={() => alert("Delete action triggered")}
+      />
 
       {/* Workspace Layout */}
       <div className="grid grid-cols-12 relative">
