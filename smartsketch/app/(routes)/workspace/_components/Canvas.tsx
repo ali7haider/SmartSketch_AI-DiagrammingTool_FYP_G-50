@@ -1,15 +1,25 @@
 import React, { useEffect } from "react";
-import { Stage, Layer, Line, Rect, Circle } from "react-konva";
+import { Stage, Layer, Line, Rect, Circle, Text, Ellipse } from "react-konva";
 import { v4 as uuidv4 } from "uuid";
 
 interface Shape {
   id: string;
-  type: "Rectangle" | "Circle";
+  type:
+    | "Rectangle"
+    | "Circle"
+    | "Round Rectangle"
+    | "Text"
+    | "Heading"
+    | "Ellipse";
+
   x: number;
   y: number;
   width?: number;
   height?: number;
   radius?: number;
+  radiusX?: number; // For Ellipse
+  radiusY?: number; // For Ellipse
+  text?: string; // For Text and Heading
   fill: string;
   stroke: string;
   strokeWidth: number;
@@ -85,7 +95,6 @@ const Canvas: React.FC<CanvasProps> = ({
     if (selectedShape === "Rectangle") {
       const rectWidth = 100;
       const rectHeight = 60;
-
       setShapes((prevShapes) => [
         ...prevShapes,
         {
@@ -103,7 +112,6 @@ const Canvas: React.FC<CanvasProps> = ({
       setSelectedShape(null);
     } else if (selectedShape === "Circle") {
       const radius = 40;
-
       setShapes((prevShapes) => [
         ...prevShapes,
         {
@@ -112,6 +120,72 @@ const Canvas: React.FC<CanvasProps> = ({
           x: canvasWidth / 2 + getRandomOffset(50),
           y: canvasHeight / 2 + getRandomOffset(50),
           radius,
+          fill: "white",
+          stroke: "black",
+          strokeWidth: 1,
+        },
+      ]);
+      setSelectedShape(null);
+    } else if (selectedShape === "Round Rectangle") {
+      const rectWidth = 120;
+      const rectHeight = 80;
+      setShapes((prevShapes) => [
+        ...prevShapes,
+        {
+          id: uuidv4(),
+          type: "Round Rectangle",
+          x: canvasWidth / 2 - rectWidth / 2 + getRandomOffset(50),
+          y: canvasHeight / 2 - rectHeight / 2 + getRandomOffset(50),
+          width: rectWidth,
+          height: rectHeight,
+          fill: "white",
+          stroke: "black",
+          strokeWidth: 1,
+        },
+      ]);
+      setSelectedShape(null);
+    } else if (selectedShape === "Text") {
+      setShapes((prevShapes) => [
+        ...prevShapes,
+        {
+          id: uuidv4(),
+          type: "Text",
+          x: canvasWidth / 2 + getRandomOffset(50),
+          y: canvasHeight / 2 + getRandomOffset(50),
+          text: "Sample Text",
+          fill: "black",
+          stroke: "none",
+          strokeWidth: 1,
+        },
+      ]);
+      setSelectedShape(null);
+    } else if (selectedShape === "Heading") {
+      setShapes((prevShapes) => [
+        ...prevShapes,
+        {
+          id: uuidv4(),
+          type: "Heading",
+          x: canvasWidth / 2 + getRandomOffset(50),
+          y: canvasHeight / 2 + getRandomOffset(50),
+          text: "Heading Text",
+          fill: "black",
+          stroke: "none",
+          strokeWidth: 1,
+        },
+      ]);
+      setSelectedShape(null);
+    } else if (selectedShape === "Ellipse") {
+      const radiusX = 60;
+      const radiusY = 40;
+      setShapes((prevShapes) => [
+        ...prevShapes,
+        {
+          id: uuidv4(),
+          type: "Ellipse",
+          x: canvasWidth / 2 + getRandomOffset(50),
+          y: canvasHeight / 2 + getRandomOffset(50),
+          radiusX,
+          radiusY,
           fill: "white",
           stroke: "black",
           strokeWidth: 1,
@@ -189,7 +263,7 @@ const Canvas: React.FC<CanvasProps> = ({
         >
           <Layer>
             {gridLines}
-            {shapes.map((shape, index) => {
+            {shapes.map((shape: Shape, index: number) => {
               if (shape.type === "Rectangle") {
                 return (
                   <Rect
@@ -205,9 +279,9 @@ const Canvas: React.FC<CanvasProps> = ({
                     }
                     draggable
                     onClick={() => handleShapeClick(shape.id)}
-                    onDragMove={(e) => {
-                      handleDragMove(index, e.target.x(), e.target.y());
-                    }}
+                    onDragMove={(e: any) =>
+                      handleDragMove(index, e.target.x(), e.target.y())
+                    }
                   />
                 );
               }
@@ -225,9 +299,95 @@ const Canvas: React.FC<CanvasProps> = ({
                     }
                     draggable
                     onClick={() => handleShapeClick(shape.id)}
-                    onDragMove={(e) => {
-                      handleDragMove(index, e.target.x(), e.target.y());
-                    }}
+                    onDragMove={(e: any) =>
+                      handleDragMove(index, e.target.x(), e.target.y())
+                    }
+                  />
+                );
+              }
+              if (shape.type === "Round Rectangle") {
+                return (
+                  <Rect
+                    key={shape.id}
+                    x={shape.x}
+                    y={shape.y}
+                    width={shape.width}
+                    height={shape.height}
+                    fill={shape.fill}
+                    stroke={shape.stroke}
+                    strokeWidth={
+                      selectedShape === shape.id ? 3 : shape.strokeWidth
+                    }
+                    cornerRadius={20} // Round corners
+                    draggable
+                    onClick={() => handleShapeClick(shape.id)}
+                    onDragMove={(e: any) =>
+                      handleDragMove(index, e.target.x(), e.target.y())
+                    }
+                  />
+                );
+              }
+              if (shape.type === "Text") {
+                return (
+                  <Text
+                    key={shape.id}
+                    x={shape.x}
+                    y={shape.y}
+                    text={shape.text || ""}
+                    fontSize={20}
+                    fill={shape.fill}
+                    stroke={shape.stroke}
+                    strokeWidth={
+                      selectedShape === shape.id ? 3 : shape.strokeWidth
+                    }
+                    draggable
+                    onClick={() => handleShapeClick(shape.id)}
+                    onDragMove={(e: any) =>
+                      handleDragMove(index, e.target.x(), e.target.y())
+                    }
+                  />
+                );
+              }
+              if (shape.type === "Heading") {
+                return (
+                  <Text
+                    key={shape.id}
+                    x={shape.x}
+                    y={shape.y}
+                    text={shape.text || ""}
+                    fontSize={40} // Larger text for heading
+                    fontStyle="bold"
+                    fill={shape.fill}
+                    stroke={shape.stroke}
+                    strokeWidth={
+                      selectedShape === shape.id ? 3 : shape.strokeWidth
+                    }
+                    draggable
+                    onClick={() => handleShapeClick(shape.id)}
+                    onDragMove={(e: any) =>
+                      handleDragMove(index, e.target.x(), e.target.y())
+                    }
+                  />
+                );
+              }
+              if (shape.type === "Ellipse") {
+                return (
+                  <Ellipse
+                    key={shape.id}
+                    x={shape.x}
+                    y={shape.y}
+                    radiusX={shape.radiusX ?? 0}
+                    radiusY={shape.radiusY ?? 0}
+                    fill={shape.fill}
+                    stroke={shape.stroke}
+                    strokeWidth={
+                      selectedShape === shape.id ? 3 : shape.strokeWidth
+                    }
+                    draggable
+                    onClick={() => handleShapeClick(shape.id)}
+                    onDragMove={(e: any) =>
+                      handleDragMove(index, e.target.x(), e.target.y())
+                    }
                   />
                 );
               }
