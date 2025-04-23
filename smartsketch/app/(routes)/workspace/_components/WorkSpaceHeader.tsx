@@ -1,17 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { Link, Save } from "lucide-react";
+import { Link, Save, Trash } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearchPlus, faSearchMinus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSearchPlus,
+  faSearchMinus,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface WorkspaceHeaderProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
+  onDelete: () => void;
 }
 const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
   onZoomIn,
   onZoomOut,
+  onDelete,
 }) => {
   return (
     <header className="bg-gray-100 border-b shadow-md">
@@ -79,6 +85,15 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
           <span className="sr-only">Zoom Out</span>
           <FontAwesomeIcon icon={faSearchMinus} className="h-5 w-5" />
         </button>
+
+        <button
+          className="text-gray-600 hover:text-teal-600"
+          onClick={onDelete}
+        >
+          <span className="sr-only">Delete</span>
+          <FontAwesomeIcon icon={faTrash} className="h-5 w-5" />
+        </button>
+
         {/* Add more buttons/icons as needed */}
       </div>
       <hr className="border-gray-300" />
