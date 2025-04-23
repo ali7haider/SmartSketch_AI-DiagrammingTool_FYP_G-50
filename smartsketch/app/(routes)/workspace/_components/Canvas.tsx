@@ -1,28 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Stage, Layer, Line, Rect, Circle } from "react-konva";
-import { v4 as uuidv4 } from "uuid"; // <-- Install this package if not already: npm install uuid
+import { v4 as uuidv4 } from "uuid";
+
+interface Shape {
+  id: string;
+  type: "Rectangle" | "Circle";
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  radius?: number;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+}
 
 interface CanvasProps {
   selectedShape: string | null;
-  zoom: number; // Zoom level passed as prop
-  setZoom: React.Dispatch<React.SetStateAction<number>>; // Set zoom function passed as prop
   setSelectedShape: React.Dispatch<React.SetStateAction<string | null>>;
+  zoom: number;
+  setZoom: React.Dispatch<React.SetStateAction<number>>;
+  shapes: Shape[];
+  setShapes: React.Dispatch<React.SetStateAction<Shape[]>>;
 }
 
 const Canvas: React.FC<CanvasProps> = ({
   selectedShape,
+  setSelectedShape,
   zoom,
   setZoom,
-  setSelectedShape,
+  shapes,
+  setShapes,
 }) => {
   const initialCanvasWidth = 800;
   const initialCanvasHeight = 600;
   const gridSize = 40;
-  const padding = 50; // Padding around the canvas
+  const padding = 50;
 
-  const [canvasWidth, setCanvasWidth] = useState(initialCanvasWidth);
-  const [canvasHeight, setCanvasHeight] = useState(initialCanvasHeight);
-  const [shapes, setShapes] = useState<any[]>([]);
+  const [canvasWidth, setCanvasWidth] = React.useState(initialCanvasWidth);
+  const [canvasHeight, setCanvasHeight] = React.useState(initialCanvasHeight);
 
   const generateGridLines = (width: number, height: number): JSX.Element[] => {
     const lines: JSX.Element[] = [];
@@ -54,7 +70,7 @@ const Canvas: React.FC<CanvasProps> = ({
     return lines;
   };
 
-  const [gridLines, setGridLines] = useState(
+  const [gridLines, setGridLines] = React.useState(
     generateGridLines(canvasWidth, canvasHeight)
   );
 
@@ -63,9 +79,8 @@ const Canvas: React.FC<CanvasProps> = ({
   }, [canvasWidth, canvasHeight]);
 
   useEffect(() => {
-    const getRandomOffset = (range: number) => {
-      return Math.random() * range * 2 - range; // Random value between -range and +range
-    };
+    const getRandomOffset = (range: number) =>
+      Math.random() * range * 2 - range;
 
     if (selectedShape === "Rectangle") {
       const rectWidth = 100;
@@ -74,36 +89,42 @@ const Canvas: React.FC<CanvasProps> = ({
       setShapes((prevShapes) => [
         ...prevShapes,
         {
-          id: uuidv4(), // Assign unique id
+          id: uuidv4(),
           type: "Rectangle",
           x: canvasWidth / 2 - rectWidth / 2 + getRandomOffset(50),
           y: canvasHeight / 2 - rectHeight / 2 + getRandomOffset(50),
           width: rectWidth,
           height: rectHeight,
-          fill: "white", // Default fill color
-          stroke: "black", // Border color
-          strokeWidth: 1, // Border thickness
+          fill: "white",
+          stroke: "black",
+          strokeWidth: 1,
         },
       ]);
-      setSelectedShape(null); // Reset selected shape after adding
+      setSelectedShape(null);
     } else if (selectedShape === "Circle") {
-      const newShape = {
-        id: uuidv4(), // Assign unique id
-        type: "Circle",
-        x: canvasWidth / 2 + getRandomOffset(50),
-        y: canvasHeight / 2 + getRandomOffset(50),
-        radius: 40,
-        fill: "white", // Default fill color
-        stroke: "black", // Border color
-        strokeWidth: 1, // Border thickness
-      };
-      setShapes((prevShapes) => [...prevShapes, newShape]);
-      setSelectedShape(null); // Reset selected shape after adding
+      const radius = 40;
+
+      setShapes((prevShapes) => [
+        ...prevShapes,
+        {
+          id: uuidv4(),
+          type: "Circle",
+          x: canvasWidth / 2 + getRandomOffset(50),
+          y: canvasHeight / 2 + getRandomOffset(50),
+          radius,
+          fill: "white",
+          stroke: "black",
+          strokeWidth: 1,
+        },
+      ]);
+      setSelectedShape(null);
     }
-  }, [selectedShape, canvasWidth, canvasHeight, setSelectedShape]);
+  }, [selectedShape, canvasWidth, canvasHeight, setShapes, setSelectedShape]);
+
   const handleShapeClick = (id: string) => {
-    setSelectedShape(id); // Update selected shape on click
+    setSelectedShape(id);
   };
+
   const handleDragMove = (index: number, newX: number, newY: number) => {
     setShapes((prevShapes) => {
       const updatedShapes = [...prevShapes];
@@ -119,14 +140,14 @@ const Canvas: React.FC<CanvasProps> = ({
     let newCanvasHeight = canvasHeight;
 
     const shape = shapes[index];
-    if (shape.x + shape.width > canvasWidth) {
-      newCanvasWidth = shape.x + shape.width + padding;
+    if (shape.x + (shape.width || shape.radius || 0) > canvasWidth) {
+      newCanvasWidth = shape.x + (shape.width || shape.radius || 0) + padding;
     }
     if (shape.x < 0) {
       newCanvasWidth = canvasWidth + Math.abs(shape.x) + padding;
     }
-    if (shape.y + shape.height > canvasHeight) {
-      newCanvasHeight = shape.y + shape.height + padding;
+    if (shape.y + (shape.height || shape.radius || 0) > canvasHeight) {
+      newCanvasHeight = shape.y + (shape.height || shape.radius || 0) + padding;
     }
     if (shape.y < 0) {
       newCanvasHeight = canvasHeight + Math.abs(shape.y) + padding;
@@ -172,7 +193,7 @@ const Canvas: React.FC<CanvasProps> = ({
               if (shape.type === "Rectangle") {
                 return (
                   <Rect
-                    key={index}
+                    key={shape.id}
                     x={shape.x}
                     y={shape.y}
                     width={shape.width}
@@ -193,12 +214,12 @@ const Canvas: React.FC<CanvasProps> = ({
               if (shape.type === "Circle") {
                 return (
                   <Circle
-                    key={index}
+                    key={shape.id}
                     x={shape.x}
                     y={shape.y}
                     radius={shape.radius}
                     fill={shape.fill}
-                    stroke={shape.stroke} // Border color
+                    stroke={shape.stroke}
                     strokeWidth={
                       selectedShape === shape.id ? 3 : shape.strokeWidth
                     }

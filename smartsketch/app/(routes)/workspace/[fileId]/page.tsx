@@ -11,19 +11,16 @@ const Workspace: React.FC = () => {
   const [selectedShape, setSelectedShape] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1); // Initialize zoom state
   const [triggerSave, setTriggerSave] = useState(false);
+  const [shapes, setShapes] = useState<any[]>([]); // Lifted shape state
   const convex = 1;
   const [codeContent, setCodeContent] = useState<string>("{}");
-  //  const convex=useConvex();
   const [fileData, setFileData] = useState<false>();
 
   const handleZoomIn = () => {
     setZoom((prevZoom) => Math.min(prevZoom + 0.1, 2)); // Limit zoom-in
   };
 
-  // In Workspace component
-
   const handleZoomOut = () => {
-    // Calculate the zoom-out limit to prevent crossing the initial size
     setZoom((prevZoom) => {
       const newZoom = prevZoom - 0.1;
       const minZoom = Math.max(
@@ -33,10 +30,20 @@ const Workspace: React.FC = () => {
       return Math.max(newZoom, minZoom); // Limit zoom-out
     });
   };
+
   const onAICreate = (input: string) => {
     console.log("AI Create button clicked with input:", input);
-    const generatedCode = `{"message": "Generated from AI: ${input}"}`; // Example AI logic
+    const generatedCode = `{"message": "Generated from AI: ${input}"}`;
     setCodeContent(generatedCode);
+  };
+
+  const handleDeleteShape = () => {
+    if (selectedShape) {
+      setShapes((prevShapes) =>
+        prevShapes.filter((shape) => shape.id !== selectedShape)
+      );
+      setSelectedShape(null);
+    }
   };
 
   return (
@@ -45,7 +52,7 @@ const Workspace: React.FC = () => {
       <WorkSpaceHeader
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
-        onDelete={() => alert("Delete action triggered")}
+        onDelete={handleDeleteShape} // Updated delete
       />
 
       {/* Workspace Layout */}
@@ -65,14 +72,15 @@ const Workspace: React.FC = () => {
             setSelectedShape={setSelectedShape}
             zoom={zoom}
             setZoom={setZoom}
+            shapes={shapes} // Pass lifted state
+            setShapes={setShapes} // Pass setter
           />
         </div>
 
         {/* Right Side Panel */}
         <DiagramRightSidebar
           onAICreate={(input) => {
-            // Logic to handle AI input (generate JSON and update state)
-            const generatedCode = `{"message": "Generated from AI: ${input}"}`; // Example
+            const generatedCode = `{"message": "Generated from AI: ${input}"}`;
             setCodeContent(generatedCode);
           }}
           className="col-span-3 h-screen border-r"
