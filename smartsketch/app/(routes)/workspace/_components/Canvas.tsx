@@ -199,44 +199,30 @@ const Canvas: React.FC<CanvasProps> = ({
   const handleDragMove = (index: number, newX: number, newY: number) => {
     setShapes((prevShapes) => {
       const updatedShapes = [...prevShapes];
-      const shape = updatedShapes[index];
-      const dx = newX - shape.x;
-      const dy = newY - shape.y;
-
-      // Update position
       updatedShapes[index] = {
-        ...shape,
+        ...updatedShapes[index],
         x: newX,
         y: newY,
-        points: shape.points
-          ? shape.points.map((value, i) =>
-              i % 2 === 0 ? value + dx : value + dy
-            )
-          : shape.points,
       };
       return updatedShapes;
     });
 
-    const shape = shapes[index];
     let newCanvasWidth = canvasWidth;
     let newCanvasHeight = canvasHeight;
 
-    const allX = shape.points?.filter((_, i) => i % 2 === 0) || [
-      shape.x + (shape.width || shape.radius || 0),
-    ];
-    const allY = shape.points?.filter((_, i) => i % 2 === 1) || [
-      shape.y + (shape.height || shape.radius || 0),
-    ];
-
-    const maxX = Math.max(...allX);
-    const minX = Math.min(...allX);
-    const maxY = Math.max(...allY);
-    const minY = Math.min(...allY);
-
-    if (maxX > canvasWidth) newCanvasWidth = maxX + padding;
-    if (minX < 0) newCanvasWidth = canvasWidth + Math.abs(minX) + padding;
-    if (maxY > canvasHeight) newCanvasHeight = maxY + padding;
-    if (minY < 0) newCanvasHeight = canvasHeight + Math.abs(minY) + padding;
+    const shape = shapes[index];
+    if (shape.x + (shape.width || shape.radius || 0) > canvasWidth) {
+      newCanvasWidth = shape.x + (shape.width || shape.radius || 0) + padding;
+    }
+    if (shape.x < 0) {
+      newCanvasWidth = canvasWidth + Math.abs(shape.x) + padding;
+    }
+    if (shape.y + (shape.height || shape.radius || 0) > canvasHeight) {
+      newCanvasHeight = shape.y + (shape.height || shape.radius || 0) + padding;
+    }
+    if (shape.y < 0) {
+      newCanvasHeight = canvasHeight + Math.abs(shape.y) + padding;
+    }
 
     setCanvasWidth(newCanvasWidth);
     setCanvasHeight(newCanvasHeight);
@@ -321,6 +307,7 @@ const Canvas: React.FC<CanvasProps> = ({
                             ? [2, 4]
                             : undefined
                       }
+                      hitStrokeWidth={20}
                     />
                   );
                 case "Directional Connector":
@@ -330,6 +317,7 @@ const Canvas: React.FC<CanvasProps> = ({
                       points={shape.points || []}
                       pointerLength={10}
                       pointerWidth={10}
+                      hitStrokeWidth={20}
                     />
                   );
                 case "Bidirectional Connector":
@@ -339,6 +327,7 @@ const Canvas: React.FC<CanvasProps> = ({
                       points={shape.points || []}
                       pointerLength={10}
                       pointerWidth={10}
+                      hitStrokeWidth={20}
                       pointerAtBeginning
                     />
                   );
