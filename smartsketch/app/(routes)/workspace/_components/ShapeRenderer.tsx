@@ -46,6 +46,16 @@ const ShapeRenderer: React.FC<ShapeRendererProps> = ({
           fill={shape.fill}
         />
       );
+    case "Round Rectangle": // Added this case for rounded rectangles
+      return (
+        <Rect
+          {...commonProps}
+          width={shape.width}
+          height={shape.height}
+          fill={shape.fill}
+          cornerRadius={shape.cornerRadius || 10} // Add the cornerRadius property for rounded corners
+        />
+      );
     case "Circle":
       return (
         <Circle {...commonProps} radius={shape.radius} fill={shape.fill} />

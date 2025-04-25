@@ -2,6 +2,7 @@ export interface Shape {
   id: string;
   type:
     | "Rectangle"
+    | "Round Rectangle"
     | "Circle"
     | "Square"
     | "Line"
@@ -15,6 +16,7 @@ export interface Shape {
   height?: number;
   radius?: number;
   points?: number[];
+  cornerRadius?: number; // For rounded rectangles
   fill: string;
   stroke: string;
   strokeWidth: number;

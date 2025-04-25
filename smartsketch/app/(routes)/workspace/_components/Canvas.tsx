@@ -95,6 +95,18 @@ const Canvas: React.FC<CanvasProps> = ({
         stroke: "black",
         strokeWidth: 1,
       });
+    } else if (selectedShape === "Round Rectangle") {
+      addShape({
+        id: uuidv4(),
+        type: "Round Rectangle",
+        x,
+        y,
+        width: 100,
+        height: 60,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+      });
     } else if (selectedShape === "Circle") {
       addShape({
         id: uuidv4(),
@@ -175,6 +187,7 @@ const Canvas: React.FC<CanvasProps> = ({
       });
     }
     const selectedNode = shapeRefs.current[selectedShape || ""];
+
     if (selectedNode && transformerRef.current) {
       transformerRef.current.nodes([selectedNode]);
       transformerRef.current.getLayer()?.batchDraw();
@@ -217,6 +230,14 @@ const Canvas: React.FC<CanvasProps> = ({
     setCanvasHeight(newCanvasHeight);
   };
 
+  const handleCanvasClick = (e: any) => {
+    // e.target is the node that was clicked; ensure it's a Konva node and not the canvas itself.
+    const clickedShape = e.target;
+
+    // Log the clicked target to debug
+    console.log("Clicked Target:", clickedShape);
+  };
+
   return (
     <div
       style={{
@@ -231,6 +252,7 @@ const Canvas: React.FC<CanvasProps> = ({
         boxSizing: "border-box",
         backgroundColor: "#FBFBFB",
       }}
+      onClick={handleCanvasClick} // Added canvas click handler here
     >
       <div
         style={{
@@ -261,7 +283,7 @@ const Canvas: React.FC<CanvasProps> = ({
               />
             ))}
 
-            {/*  Add Transformer at the end */}
+            {/* Add Transformer at the end */}
             {selectedShape && shapeRefs.current[selectedShape] && (
               <Transformer
                 ref={transformerRef}
