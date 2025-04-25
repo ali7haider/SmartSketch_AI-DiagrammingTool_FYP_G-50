@@ -1,82 +1,91 @@
 import React from "react";
-import { Rect, Circle, Ellipse, Text } from "react-konva";
+import { Rect, Circle, Line, Arrow } from "react-konva";
+import { Shape } from "./types";
 
-interface Shape {
-  id: string;
-  type: string;
-  x: number;
-  y: number;
-  width?: number;
-  height?: number;
-  radius?: number;
-  radiusX?: number;
-  radiusY?: number;
-  fill: string;
-  stroke: string;
-  strokeWidth: number;
-  text?: string;
-}
-
-interface RenderShapeProps {
+interface ShapeRendererProps {
   shape: Shape;
   index: number;
-  selectedShape: string | null;
+  isSelected: boolean;
   handleShapeClick: (id: string) => void;
-  handleDragMove: (index: number, newX: number, newY: number) => void;
+  handleDragMove: (index: number, x: number, y: number) => void;
+  shapeRefs: React.MutableRefObject<Record<string, any>>;
 }
 
-const ShapeRenderer: React.FC<RenderShapeProps> = ({
+const ShapeRenderer: React.FC<ShapeRendererProps> = ({
   shape,
   index,
-  selectedShape,
+  isSelected,
   handleShapeClick,
   handleDragMove,
+  shapeRefs,
 }) => {
   const commonProps = {
     key: shape.id,
     x: shape.x,
     y: shape.y,
-    fill: shape.fill,
     stroke: shape.stroke,
-    strokeWidth: selectedShape === shape.id ? 3 : shape.strokeWidth,
+    strokeWidth: isSelected ? 3 : shape.strokeWidth,
     draggable: true,
     onClick: () => handleShapeClick(shape.id),
-    onDragMove: (e: any) => handleDragMove(index, e.target.x(), e.target.y()),
+    onDragMove: (e: any) => {
+      handleDragMove(index, e.target.x(), e.target.y());
+    },
+    ref: (node: any) => {
+      if (node) shapeRefs.current[shape.id] = node;
+    },
   };
 
   switch (shape.type) {
     case "Rectangle":
-      return (
-        <Rect {...commonProps} width={shape.width} height={shape.height} />
-      );
-    case "Round Rectangle":
+    case "Square":
       return (
         <Rect
           {...commonProps}
           width={shape.width}
           height={shape.height}
-          cornerRadius={20}
+          fill={shape.fill}
         />
       );
     case "Circle":
-      return <Circle {...commonProps} radius={shape.radius} />;
-    case "Ellipse":
       return (
-        <Ellipse
+        <Circle {...commonProps} radius={shape.radius} fill={shape.fill} />
+      );
+    case "Line":
+    case "Dashed Line":
+    case "Dotted Line":
+      return (
+        <Line
           {...commonProps}
-          radiusX={shape.radiusX || 50}
-          radiusY={shape.radiusY || 30}
+          points={shape.points || []}
+          dash={
+            shape.type === "Dashed Line"
+              ? [10, 5]
+              : shape.type === "Dotted Line"
+                ? [2, 4]
+                : undefined
+          }
+          hitStrokeWidth={20}
         />
       );
-    case "Text":
-      return <Text {...commonProps} text={shape.text || ""} fontSize={20} />;
-    case "Heading":
+    case "Directional Connector":
       return (
-        <Text
+        <Arrow
           {...commonProps}
-          text={shape.text || ""}
-          fontSize={40}
-          fontStyle="bold"
+          points={shape.points || []}
+          pointerLength={10}
+          pointerWidth={10}
+          hitStrokeWidth={20}
+        />
+      );
+    case "Bidirectional Connector":
+      return (
+        <Arrow
+          {...commonProps}
+          points={shape.points || []}
+          pointerLength={10}
+          pointerWidth={10}
+          pointerAtBeginning
+          hitStrokeWidth={20}
         />
       );
     default:

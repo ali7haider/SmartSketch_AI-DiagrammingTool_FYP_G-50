@@ -1,28 +1,10 @@
 import React, { useEffect } from "react";
 import { Stage, Layer, Line, Rect, Circle, Arrow } from "react-konva";
 import { v4 as uuidv4 } from "uuid";
-
-interface Shape {
-  id: string;
-  type:
-    | "Rectangle"
-    | "Circle"
-    | "Square"
-    | "Line"
-    | "Dashed Line"
-    | "Dotted Line"
-    | "Directional Connector"
-    | "Bidirectional Connector";
-  x: number;
-  y: number;
-  width?: number;
-  height?: number;
-  radius?: number;
-  points?: number[];
-  fill: string;
-  stroke: string;
-  strokeWidth: number;
-}
+import { Transformer } from "react-konva";
+import Konva from "konva";
+import { Shape } from "./types";
+import ShapeRenderer from "./ShapeRenderer";
 
 interface CanvasProps {
   selectedShape: string | null;
@@ -45,6 +27,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const initialCanvasHeight = 600;
   const gridSize = 40;
   const padding = 50;
+  const transformerRef = React.useRef<any>(null);
+  const shapeRefs = React.useRef<Record<string, any>>({});
 
   const [canvasWidth, setCanvasWidth] = React.useState(initialCanvasWidth);
   const [canvasHeight, setCanvasHeight] = React.useState(initialCanvasHeight);
@@ -138,7 +122,7 @@ const Canvas: React.FC<CanvasProps> = ({
       addShape({
         id: uuidv4(),
         type: "Line",
-        points: [0, 0, 100, 0], // ✅ relative coordinates
+        points: [0, 0, 100, 0],
         x,
         y,
         fill: "",
@@ -189,6 +173,11 @@ const Canvas: React.FC<CanvasProps> = ({
         stroke: "black",
         strokeWidth: 2,
       });
+    }
+    const selectedNode = shapeRefs.current[selectedShape || ""];
+    if (selectedNode && transformerRef.current) {
+      transformerRef.current.nodes([selectedNode]);
+      transformerRef.current.getLayer()?.batchDraw();
     }
   }, [selectedShape, canvasWidth, canvasHeight, setShapes, setSelectedShape]);
 
@@ -260,81 +249,31 @@ const Canvas: React.FC<CanvasProps> = ({
         >
           <Layer>
             {gridLines}
-            {shapes.map((shape, index) => {
-              const commonProps = {
-                key: shape.id,
-                x: shape.x,
-                y: shape.y,
-                stroke: shape.stroke,
-                strokeWidth: selectedShape === shape.id ? 3 : shape.strokeWidth,
-                draggable: true,
-                onClick: () => handleShapeClick(shape.id),
-                onDragMove: (e: any) => {
-                  handleDragMove(index, e.target.x(), e.target.y());
-                },
-              };
+            {shapes.map((shape, index) => (
+              <ShapeRenderer
+                key={shape.id}
+                shape={shape}
+                index={index}
+                isSelected={selectedShape === shape.id}
+                handleShapeClick={handleShapeClick}
+                handleDragMove={handleDragMove}
+                shapeRefs={shapeRefs}
+              />
+            ))}
 
-              switch (shape.type) {
-                case "Rectangle":
-                case "Square":
-                  return (
-                    <Rect
-                      {...commonProps}
-                      width={shape.width}
-                      height={shape.height}
-                      fill={shape.fill}
-                    />
-                  );
-                case "Circle":
-                  return (
-                    <Circle
-                      {...commonProps}
-                      radius={shape.radius}
-                      fill={shape.fill}
-                    />
-                  );
-                case "Line":
-                case "Dashed Line":
-                case "Dotted Line":
-                  return (
-                    <Line
-                      {...commonProps}
-                      points={shape.points || []}
-                      dash={
-                        shape.type === "Dashed Line"
-                          ? [10, 5]
-                          : shape.type === "Dotted Line"
-                            ? [2, 4]
-                            : undefined
-                      }
-                      hitStrokeWidth={20}
-                    />
-                  );
-                case "Directional Connector":
-                  return (
-                    <Arrow
-                      {...commonProps}
-                      points={shape.points || []}
-                      pointerLength={10}
-                      pointerWidth={10}
-                      hitStrokeWidth={20}
-                    />
-                  );
-                case "Bidirectional Connector":
-                  return (
-                    <Arrow
-                      {...commonProps}
-                      points={shape.points || []}
-                      pointerLength={10}
-                      pointerWidth={10}
-                      hitStrokeWidth={20}
-                      pointerAtBeginning
-                    />
-                  );
-                default:
-                  return null;
-              }
-            })}
+            {/*  Add Transformer at the end */}
+            {selectedShape && shapeRefs.current[selectedShape] && (
+              <Transformer
+                ref={transformerRef}
+                boundBoxFunc={(oldBox, newBox) => {
+                  // Prevent resizing smaller than 5x5
+                  if (newBox.width < 5 || newBox.height < 5) {
+                    return oldBox;
+                  }
+                  return newBox;
+                }}
+              />
+            )}
           </Layer>
         </Stage>
       </div>
