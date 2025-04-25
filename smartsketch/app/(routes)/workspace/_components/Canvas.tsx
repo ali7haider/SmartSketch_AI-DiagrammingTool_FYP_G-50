@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Stage, Layer, Line, Rect, Circle, Text, Ellipse } from "react-konva";
+import { Stage, Layer, Line, Rect, Circle, Arrow } from "react-konva";
 import { v4 as uuidv4 } from "uuid";
 
 interface Shape {
@@ -7,19 +7,18 @@ interface Shape {
   type:
     | "Rectangle"
     | "Circle"
-    | "Round Rectangle"
-    | "Text"
-    | "Heading"
-    | "Ellipse";
-
+    | "Square"
+    | "Line"
+    | "Dashed Line"
+    | "Dotted Line"
+    | "Directional Connector"
+    | "Bidirectional Connector";
   x: number;
   y: number;
   width?: number;
   height?: number;
   radius?: number;
-  radiusX?: number; // For Ellipse
-  radiusY?: number; // For Ellipse
-  text?: string; // For Text and Heading
+  points?: number[];
   fill: string;
   stroke: string;
   strokeWidth: number;
@@ -92,106 +91,104 @@ const Canvas: React.FC<CanvasProps> = ({
     const getRandomOffset = (range: number) =>
       Math.random() * range * 2 - range;
 
+    const addShape = (shape: Shape) => {
+      setShapes((prevShapes) => [...prevShapes, shape]);
+      setSelectedShape(null);
+    };
+
+    const x = canvasWidth / 2 + getRandomOffset(50);
+    const y = canvasHeight / 2 + getRandomOffset(50);
+
     if (selectedShape === "Rectangle") {
-      const rectWidth = 100;
-      const rectHeight = 60;
-      setShapes((prevShapes) => [
-        ...prevShapes,
-        {
-          id: uuidv4(),
-          type: "Rectangle",
-          x: canvasWidth / 2 - rectWidth / 2 + getRandomOffset(50),
-          y: canvasHeight / 2 - rectHeight / 2 + getRandomOffset(50),
-          width: rectWidth,
-          height: rectHeight,
-          fill: "white",
-          stroke: "black",
-          strokeWidth: 1,
-        },
-      ]);
-      setSelectedShape(null);
+      addShape({
+        id: uuidv4(),
+        type: "Rectangle",
+        x,
+        y,
+        width: 100,
+        height: 60,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+      });
     } else if (selectedShape === "Circle") {
-      const radius = 40;
-      setShapes((prevShapes) => [
-        ...prevShapes,
-        {
-          id: uuidv4(),
-          type: "Circle",
-          x: canvasWidth / 2 + getRandomOffset(50),
-          y: canvasHeight / 2 + getRandomOffset(50),
-          radius,
-          fill: "white",
-          stroke: "black",
-          strokeWidth: 1,
-        },
-      ]);
-      setSelectedShape(null);
-    } else if (selectedShape === "Round Rectangle") {
-      const rectWidth = 120;
-      const rectHeight = 80;
-      setShapes((prevShapes) => [
-        ...prevShapes,
-        {
-          id: uuidv4(),
-          type: "Round Rectangle",
-          x: canvasWidth / 2 - rectWidth / 2 + getRandomOffset(50),
-          y: canvasHeight / 2 - rectHeight / 2 + getRandomOffset(50),
-          width: rectWidth,
-          height: rectHeight,
-          fill: "white",
-          stroke: "black",
-          strokeWidth: 1,
-        },
-      ]);
-      setSelectedShape(null);
-    } else if (selectedShape === "Text") {
-      setShapes((prevShapes) => [
-        ...prevShapes,
-        {
-          id: uuidv4(),
-          type: "Text",
-          x: canvasWidth / 2 + getRandomOffset(50),
-          y: canvasHeight / 2 + getRandomOffset(50),
-          text: "Sample Text",
-          fill: "black",
-          stroke: "none",
-          strokeWidth: 1,
-        },
-      ]);
-      setSelectedShape(null);
-    } else if (selectedShape === "Heading") {
-      setShapes((prevShapes) => [
-        ...prevShapes,
-        {
-          id: uuidv4(),
-          type: "Heading",
-          x: canvasWidth / 2 + getRandomOffset(50),
-          y: canvasHeight / 2 + getRandomOffset(50),
-          text: "Heading Text",
-          fill: "black",
-          stroke: "none",
-          strokeWidth: 1,
-        },
-      ]);
-      setSelectedShape(null);
-    } else if (selectedShape === "Ellipse") {
-      const radiusX = 60;
-      const radiusY = 40;
-      setShapes((prevShapes) => [
-        ...prevShapes,
-        {
-          id: uuidv4(),
-          type: "Ellipse",
-          x: canvasWidth / 2 + getRandomOffset(50),
-          y: canvasHeight / 2 + getRandomOffset(50),
-          radiusX,
-          radiusY,
-          fill: "white",
-          stroke: "black",
-          strokeWidth: 1,
-        },
-      ]);
-      setSelectedShape(null);
+      addShape({
+        id: uuidv4(),
+        type: "Circle",
+        x,
+        y,
+        radius: 40,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+      });
+    } else if (selectedShape === "Square") {
+      addShape({
+        id: uuidv4(),
+        type: "Square",
+        x,
+        y,
+        width: 60,
+        height: 60,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+      });
+    } else if (selectedShape === "Line") {
+      addShape({
+        id: uuidv4(),
+        type: "Line",
+        points: [0, 0, 100, 0], // ✅ relative coordinates
+        x,
+        y,
+        fill: "",
+        stroke: "black",
+        strokeWidth: 2,
+      });
+    } else if (selectedShape === "Dashed Line") {
+      addShape({
+        id: uuidv4(),
+        type: "Dashed Line",
+        points: [0, 0, 100, 0], // ✅ relative coordinates
+        x,
+        y,
+        fill: "",
+        stroke: "black",
+        strokeWidth: 2,
+      });
+    } else if (selectedShape === "Dotted Line") {
+      addShape({
+        id: uuidv4(),
+        type: "Dotted Line",
+        points: [0, 0, 100, 0], // ✅ relative coordinates
+        x,
+        y,
+        fill: "",
+        stroke: "black",
+        strokeWidth: 2,
+      });
+    } else if (selectedShape === "Directional Connector") {
+      addShape({
+        id: uuidv4(),
+        type: "Directional Connector",
+        points: [0, 0, 100, 0], // ✅ relative coordinates
+        x,
+        y,
+        fill: "",
+        stroke: "black",
+        strokeWidth: 2,
+      });
+    } else if (selectedShape === "Bidirectional Connector") {
+      addShape({
+        id: uuidv4(),
+        type: "Bidirectional Connector",
+        points: [0, 0, 100, 0], // ✅ relative coordinates
+        x,
+        y,
+        fill: "",
+        stroke: "black",
+        strokeWidth: 2,
+      });
     }
   }, [selectedShape, canvasWidth, canvasHeight, setShapes, setSelectedShape]);
 
@@ -202,30 +199,44 @@ const Canvas: React.FC<CanvasProps> = ({
   const handleDragMove = (index: number, newX: number, newY: number) => {
     setShapes((prevShapes) => {
       const updatedShapes = [...prevShapes];
+      const shape = updatedShapes[index];
+      const dx = newX - shape.x;
+      const dy = newY - shape.y;
+
+      // Update position
       updatedShapes[index] = {
-        ...updatedShapes[index],
+        ...shape,
         x: newX,
         y: newY,
+        points: shape.points
+          ? shape.points.map((value, i) =>
+              i % 2 === 0 ? value + dx : value + dy
+            )
+          : shape.points,
       };
       return updatedShapes;
     });
 
+    const shape = shapes[index];
     let newCanvasWidth = canvasWidth;
     let newCanvasHeight = canvasHeight;
 
-    const shape = shapes[index];
-    if (shape.x + (shape.width || shape.radius || 0) > canvasWidth) {
-      newCanvasWidth = shape.x + (shape.width || shape.radius || 0) + padding;
-    }
-    if (shape.x < 0) {
-      newCanvasWidth = canvasWidth + Math.abs(shape.x) + padding;
-    }
-    if (shape.y + (shape.height || shape.radius || 0) > canvasHeight) {
-      newCanvasHeight = shape.y + (shape.height || shape.radius || 0) + padding;
-    }
-    if (shape.y < 0) {
-      newCanvasHeight = canvasHeight + Math.abs(shape.y) + padding;
-    }
+    const allX = shape.points?.filter((_, i) => i % 2 === 0) || [
+      shape.x + (shape.width || shape.radius || 0),
+    ];
+    const allY = shape.points?.filter((_, i) => i % 2 === 1) || [
+      shape.y + (shape.height || shape.radius || 0),
+    ];
+
+    const maxX = Math.max(...allX);
+    const minX = Math.min(...allX);
+    const maxY = Math.max(...allY);
+    const minY = Math.min(...allY);
+
+    if (maxX > canvasWidth) newCanvasWidth = maxX + padding;
+    if (minX < 0) newCanvasWidth = canvasWidth + Math.abs(minX) + padding;
+    if (maxY > canvasHeight) newCanvasHeight = maxY + padding;
+    if (minY < 0) newCanvasHeight = canvasHeight + Math.abs(minY) + padding;
 
     setCanvasWidth(newCanvasWidth);
     setCanvasHeight(newCanvasHeight);
@@ -263,135 +274,77 @@ const Canvas: React.FC<CanvasProps> = ({
         >
           <Layer>
             {gridLines}
-            {shapes.map((shape: Shape, index: number) => {
-              if (shape.type === "Rectangle") {
-                return (
-                  <Rect
-                    key={shape.id}
-                    x={shape.x}
-                    y={shape.y}
-                    width={shape.width}
-                    height={shape.height}
-                    fill={shape.fill}
-                    stroke={shape.stroke}
-                    strokeWidth={
-                      selectedShape === shape.id ? 3 : shape.strokeWidth
-                    }
-                    draggable
-                    onClick={() => handleShapeClick(shape.id)}
-                    onDragMove={(e: any) =>
-                      handleDragMove(index, e.target.x(), e.target.y())
-                    }
-                  />
-                );
+            {shapes.map((shape, index) => {
+              const commonProps = {
+                key: shape.id,
+                x: shape.x,
+                y: shape.y,
+                stroke: shape.stroke,
+                strokeWidth: selectedShape === shape.id ? 3 : shape.strokeWidth,
+                draggable: true,
+                onClick: () => handleShapeClick(shape.id),
+                onDragMove: (e: any) => {
+                  handleDragMove(index, e.target.x(), e.target.y());
+                },
+              };
+
+              switch (shape.type) {
+                case "Rectangle":
+                case "Square":
+                  return (
+                    <Rect
+                      {...commonProps}
+                      width={shape.width}
+                      height={shape.height}
+                      fill={shape.fill}
+                    />
+                  );
+                case "Circle":
+                  return (
+                    <Circle
+                      {...commonProps}
+                      radius={shape.radius}
+                      fill={shape.fill}
+                    />
+                  );
+                case "Line":
+                case "Dashed Line":
+                case "Dotted Line":
+                  return (
+                    <Line
+                      {...commonProps}
+                      points={shape.points || []}
+                      dash={
+                        shape.type === "Dashed Line"
+                          ? [10, 5]
+                          : shape.type === "Dotted Line"
+                            ? [2, 4]
+                            : undefined
+                      }
+                    />
+                  );
+                case "Directional Connector":
+                  return (
+                    <Arrow
+                      {...commonProps}
+                      points={shape.points || []}
+                      pointerLength={10}
+                      pointerWidth={10}
+                    />
+                  );
+                case "Bidirectional Connector":
+                  return (
+                    <Arrow
+                      {...commonProps}
+                      points={shape.points || []}
+                      pointerLength={10}
+                      pointerWidth={10}
+                      pointerAtBeginning
+                    />
+                  );
+                default:
+                  return null;
               }
-              if (shape.type === "Circle") {
-                return (
-                  <Circle
-                    key={shape.id}
-                    x={shape.x}
-                    y={shape.y}
-                    radius={shape.radius}
-                    fill={shape.fill}
-                    stroke={shape.stroke}
-                    strokeWidth={
-                      selectedShape === shape.id ? 3 : shape.strokeWidth
-                    }
-                    draggable
-                    onClick={() => handleShapeClick(shape.id)}
-                    onDragMove={(e: any) =>
-                      handleDragMove(index, e.target.x(), e.target.y())
-                    }
-                  />
-                );
-              }
-              if (shape.type === "Round Rectangle") {
-                return (
-                  <Rect
-                    key={shape.id}
-                    x={shape.x}
-                    y={shape.y}
-                    width={shape.width}
-                    height={shape.height}
-                    fill={shape.fill}
-                    stroke={shape.stroke}
-                    strokeWidth={
-                      selectedShape === shape.id ? 3 : shape.strokeWidth
-                    }
-                    cornerRadius={20} // Round corners
-                    draggable
-                    onClick={() => handleShapeClick(shape.id)}
-                    onDragMove={(e: any) =>
-                      handleDragMove(index, e.target.x(), e.target.y())
-                    }
-                  />
-                );
-              }
-              if (shape.type === "Text") {
-                return (
-                  <Text
-                    key={shape.id}
-                    x={shape.x}
-                    y={shape.y}
-                    text={shape.text || ""}
-                    fontSize={20}
-                    fill={shape.fill}
-                    stroke={shape.stroke}
-                    strokeWidth={
-                      selectedShape === shape.id ? 3 : shape.strokeWidth
-                    }
-                    draggable
-                    onClick={() => handleShapeClick(shape.id)}
-                    onDragMove={(e: any) =>
-                      handleDragMove(index, e.target.x(), e.target.y())
-                    }
-                  />
-                );
-              }
-              if (shape.type === "Heading") {
-                return (
-                  <Text
-                    key={shape.id}
-                    x={shape.x}
-                    y={shape.y}
-                    text={shape.text || ""}
-                    fontSize={40} // Larger text for heading
-                    fontStyle="bold"
-                    fill={shape.fill}
-                    stroke={shape.stroke}
-                    strokeWidth={
-                      selectedShape === shape.id ? 3 : shape.strokeWidth
-                    }
-                    draggable
-                    onClick={() => handleShapeClick(shape.id)}
-                    onDragMove={(e: any) =>
-                      handleDragMove(index, e.target.x(), e.target.y())
-                    }
-                  />
-                );
-              }
-              if (shape.type === "Ellipse") {
-                return (
-                  <Ellipse
-                    key={shape.id}
-                    x={shape.x}
-                    y={shape.y}
-                    radiusX={shape.radiusX ?? 0}
-                    radiusY={shape.radiusY ?? 0}
-                    fill={shape.fill}
-                    stroke={shape.stroke}
-                    strokeWidth={
-                      selectedShape === shape.id ? 3 : shape.strokeWidth
-                    }
-                    draggable
-                    onClick={() => handleShapeClick(shape.id)}
-                    onDragMove={(e: any) =>
-                      handleDragMove(index, e.target.x(), e.target.y())
-                    }
-                  />
-                );
-              }
-              return null;
             })}
           </Layer>
         </Stage>
