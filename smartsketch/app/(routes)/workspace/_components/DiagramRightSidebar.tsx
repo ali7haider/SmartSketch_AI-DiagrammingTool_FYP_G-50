@@ -3,7 +3,7 @@ import React, { useState } from "react";
 
 // Define the type for the props
 interface DiagramRightSidebarProps {
-  onAICreate: (input: string) => void;
+  onAICreate: (input: any) => void;
   className?: string; // Add className explicitly
   codeContent: string; // Current JSON code of the diagram
   updateCode: (newCode: string) => void; // Function to update the code
@@ -19,29 +19,14 @@ const DiagramRightSidebar: React.FC<DiagramRightSidebarProps> = ({
   const [aiInput, setAiInput] = useState(""); // AI input text
 
   const handleApplyChanges = () => {
-    onAICreate(aiInput);
+    console.log("handleApplyChanges called"); // Debug log
+    try {
+      const parsedData = JSON.parse(codeContent);
+      onAICreate(parsedData); // Pass the parsed data to the parent function
+    } catch (error) {
+      alert("Invalid JSON format. Please correct it and try again.");
+    }
   };
-
-  const dummyJson = JSON.stringify(
-    {
-      nodes: [
-        { id: "1", label: "Start", type: "circle", position: { x: 50, y: 50 } },
-        {
-          id: "2",
-          label: "Process",
-          type: "rect",
-          position: { x: 200, y: 50 },
-        },
-        { id: "3", label: "End", type: "circle", position: { x: 350, y: 50 } },
-      ],
-      edges: [
-        { from: "1", to: "2", label: "Next" },
-        { from: "2", to: "3", label: "Finish" },
-      ],
-    },
-    null,
-    2
-  );
 
   return (
     <div
@@ -79,7 +64,10 @@ const DiagramRightSidebar: React.FC<DiagramRightSidebarProps> = ({
             />
             <button
               className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded shadow"
-              onClick={handleApplyChanges}
+              onClick={() => {
+                setAiInput(""); // Clear the AI input
+                updateCode(aiInput); // Update the code content
+              }}
             >
               Apply Changes
             </button>
@@ -87,9 +75,18 @@ const DiagramRightSidebar: React.FC<DiagramRightSidebarProps> = ({
         )}
         {activeTab === "Code" && (
           <div>
-            <pre className="bg-gray-200 p-2 rounded overflow-x-auto text-xs">
-              {dummyJson || codeContent}
-            </pre>
+            <textarea
+              className="w-full h-32 p-2 border rounded"
+              placeholder="Edit JSON code here..."
+              value={codeContent}
+              onChange={(e) => updateCode(e.target.value)} // Update the code content dynamically
+            />
+            <button
+              className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded shadow mt-4"
+              onClick={handleApplyChanges}
+            >
+              Update Canvas
+            </button>
           </div>
         )}
       </div>

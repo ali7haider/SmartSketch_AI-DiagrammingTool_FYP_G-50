@@ -12,7 +12,6 @@ const Workspace: React.FC = () => {
   const [zoom, setZoom] = useState(1); // Initialize zoom state
   const [triggerSave, setTriggerSave] = useState(false);
   const [shapes, setShapes] = useState<any[]>([]); // Lifted shape state
-  const convex = 1;
   const [codeContent, setCodeContent] = useState<string>("{}");
   const [fileData, setFileData] = useState<false>();
 
@@ -31,10 +30,18 @@ const Workspace: React.FC = () => {
     });
   };
 
-  const onAICreate = (input: string) => {
-    console.log("AI Create button clicked with input:", input);
-    const generatedCode = `{"message": "Generated from AI: ${input}"}`;
-    setCodeContent(generatedCode);
+  // Update this function to parse JSON and update shapes
+  const onAICreate = (input: any) => {
+    try {
+      const parsedShapes = Array.isArray(input) ? input : JSON.parse(input);
+      console.debug("Parsed shapes from AI input:", parsedShapes);
+      setShapes(parsedShapes); // Update the shapes state
+      console.log("Updated shapes state:", parsedShapes); // Debug log
+      setCodeContent(JSON.stringify(parsedShapes, null, 2));
+    } catch (error) {
+      console.error("Invalid JSON format:", error);
+      alert("Invalid JSON format. Please correct it and try again.");
+    }
   };
 
   const handleDeleteShape = () => {
@@ -79,13 +86,10 @@ const Workspace: React.FC = () => {
 
         {/* Right Side Panel */}
         <DiagramRightSidebar
-          onAICreate={(input) => {
-            const generatedCode = `{"message": "Generated from AI: ${input}"}`;
-            setCodeContent(generatedCode);
-          }}
+          onAICreate={onAICreate} // Updated to handle JSON input
+          codeContent={codeContent} // Pass current JSON code
           className="col-span-3 h-screen border-r"
-          codeContent={codeContent}
-          updateCode={(newCode) => setCodeContent(newCode)}
+          updateCode={setCodeContent} // Update JSON code dynamically
         />
       </div>
     </div>
