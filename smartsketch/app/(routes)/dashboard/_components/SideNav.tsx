@@ -23,13 +23,15 @@ function SideNav() {
   },[activeTeam])
   const onFileCreate=(fileName:string)=>{
     console.log(fileName)
+    const safeCreatedAt = JSON.stringify(new Date().toISOString()).replace(/"/g, '');
     createFile({
       fileName:fileName,
       teamId:activeTeam?._id,
       createdBy:user?.email,
       archive:false,
       document:'',
-      whiteboard:''
+      whiteboard:'',
+      createdAt: Date.now(),  
     }).then(resp=>{
       if(resp)
       {
