@@ -6,6 +6,7 @@ import Konva from "konva";
 import { Shape } from "./types";
 import ShapeRenderer from "./ShapeRenderer";
 
+
 interface CanvasProps {
   selectedShape: string | null;
   setSelectedShape: React.Dispatch<React.SetStateAction<string | null>>;
@@ -13,6 +14,7 @@ interface CanvasProps {
   setZoom: React.Dispatch<React.SetStateAction<number>>;
   shapes: Shape[];
   setShapes: React.Dispatch<React.SetStateAction<Shape[]>>;
+  addClassesFromJson?: (callback: (classesJson: any[]) => void) => void;
 }
 
 const Canvas: React.FC<CanvasProps> = ({
@@ -22,6 +24,7 @@ const Canvas: React.FC<CanvasProps> = ({
   setZoom,
   shapes,
   setShapes,
+  addClassesFromJson,
 }) => {
   const initialCanvasWidth = 800;
   const initialCanvasHeight = 600;
@@ -32,6 +35,33 @@ const Canvas: React.FC<CanvasProps> = ({
 
   const [canvasWidth, setCanvasWidth] = React.useState(initialCanvasWidth);
   const [canvasHeight, setCanvasHeight] = React.useState(initialCanvasHeight);
+
+  // Function to add classes from JSON
+  const addClassesFromJsonInternal = (classesJson: any[]) => {
+    const newShapes: Shape[] = classesJson.map((cls) => ({
+      id: uuidv4(),
+      type: "Class",
+      x: cls.x,
+      y: cls.y,
+      width: cls.width,
+      height: cls.height,
+      fill: "white",
+      stroke: "black",
+      strokeWidth: 2,
+      className: cls.className,
+      attributes: cls.attributes,
+      methods: cls.methods,
+    }));
+
+    setShapes((prev) => [...prev, ...newShapes]);
+  };
+
+  // Pass the function to the parent via props
+  useEffect(() => {
+    if (addClassesFromJson) {
+      addClassesFromJson(addClassesFromJsonInternal);
+    }
+  }, [addClassesFromJson]);
 
   const generateGridLines = (width: number, height: number): JSX.Element[] => {
     const lines: JSX.Element[] = [];
@@ -71,129 +101,6 @@ const Canvas: React.FC<CanvasProps> = ({
     setGridLines(generateGridLines(canvasWidth, canvasHeight));
   }, [canvasWidth, canvasHeight]);
 
-  useEffect(() => {
-    const getRandomOffset = (range: number) =>
-      Math.random() * range * 2 - range;
-
-    const addShape = (shape: Shape) => {
-      setShapes((prevShapes) => [...prevShapes, shape]);
-      setSelectedShape(null);
-    };
-
-    const x = canvasWidth / 2 + getRandomOffset(50);
-    const y = canvasHeight / 2 + getRandomOffset(50);
-
-    if (selectedShape === "Rectangle") {
-      addShape({
-        id: uuidv4(),
-        type: "Rectangle",
-        x,
-        y,
-        width: 100,
-        height: 60,
-        fill: "white",
-        stroke: "black",
-        strokeWidth: 1,
-      });
-    } else if (selectedShape === "Round Rectangle") {
-      addShape({
-        id: uuidv4(),
-        type: "Round Rectangle",
-        x,
-        y,
-        width: 100,
-        height: 60,
-        fill: "white",
-        stroke: "black",
-        strokeWidth: 1,
-      });
-    } else if (selectedShape === "Circle") {
-      addShape({
-        id: uuidv4(),
-        type: "Circle",
-        x,
-        y,
-        radius: 40,
-        fill: "white",
-        stroke: "black",
-        strokeWidth: 1,
-      });
-    } else if (selectedShape === "Square") {
-      addShape({
-        id: uuidv4(),
-        type: "Square",
-        x,
-        y,
-        width: 60,
-        height: 60,
-        fill: "white",
-        stroke: "black",
-        strokeWidth: 1,
-      });
-    } else if (selectedShape === "Line") {
-      addShape({
-        id: uuidv4(),
-        type: "Line",
-        points: [0, 0, 100, 0],
-        x,
-        y,
-        fill: "",
-        stroke: "black",
-        strokeWidth: 2,
-      });
-    } else if (selectedShape === "Dashed Line") {
-      addShape({
-        id: uuidv4(),
-        type: "Dashed Line",
-        points: [0, 0, 100, 0], // ✅ relative coordinates
-        x,
-        y,
-        fill: "",
-        stroke: "black",
-        strokeWidth: 2,
-      });
-    } else if (selectedShape === "Dotted Line") {
-      addShape({
-        id: uuidv4(),
-        type: "Dotted Line",
-        points: [0, 0, 100, 0], // ✅ relative coordinates
-        x,
-        y,
-        fill: "",
-        stroke: "black",
-        strokeWidth: 2,
-      });
-    } else if (selectedShape === "Directional Connector") {
-      addShape({
-        id: uuidv4(),
-        type: "Directional Connector",
-        points: [0, 0, 100, 0], // ✅ relative coordinates
-        x,
-        y,
-        fill: "",
-        stroke: "black",
-        strokeWidth: 2,
-      });
-    } else if (selectedShape === "Bidirectional Connector") {
-      addShape({
-        id: uuidv4(),
-        type: "Bidirectional Connector",
-        points: [0, 0, 100, 0], // ✅ relative coordinates
-        x,
-        y,
-        fill: "",
-        stroke: "black",
-        strokeWidth: 2,
-      });
-    }
-    const selectedNode = shapeRefs.current[selectedShape || ""];
-
-    if (selectedNode && transformerRef.current) {
-      transformerRef.current.nodes([selectedNode]);
-      transformerRef.current.getLayer()?.batchDraw();
-    }
-  }, [selectedShape, canvasWidth, canvasHeight, setShapes, setSelectedShape]);
-
   const handleShapeClick = (id: string) => {
     setSelectedShape(id);
   };
@@ -231,10 +138,7 @@ const Canvas: React.FC<CanvasProps> = ({
   };
 
   const handleCanvasClick = (e: any) => {
-    // e.target is the node that was clicked; ensure it's a Konva node and not the canvas itself.
     const clickedShape = e.target;
-
-    // Log the clicked target to debug
     console.log("Clicked Target:", clickedShape);
   };
 
@@ -252,7 +156,7 @@ const Canvas: React.FC<CanvasProps> = ({
         boxSizing: "border-box",
         backgroundColor: "#FBFBFB",
       }}
-      onClick={handleCanvasClick} // Added canvas click handler here
+      onClick={handleCanvasClick}
     >
       <div
         style={{
@@ -283,12 +187,10 @@ const Canvas: React.FC<CanvasProps> = ({
               />
             ))}
 
-            {/* Add Transformer at the end */}
             {selectedShape && shapeRefs.current[selectedShape] && (
               <Transformer
                 ref={transformerRef}
                 boundBoxFunc={(oldBox, newBox) => {
-                  // Prevent resizing smaller than 5x5
                   if (newBox.width < 5 || newBox.height < 5) {
                     return oldBox;
                   }

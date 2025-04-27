@@ -31,19 +31,15 @@ const Workspace: React.FC = () => {
   };
 
   // Update this function to parse JSON and update shapes
-  const onAICreate = (input: any) => {
+  const handleAICreate = (json: any[]) => {
     try {
-      const parsedShapes = Array.isArray(input) ? input : JSON.parse(input);
-      console.debug("Parsed shapes from AI input:", parsedShapes);
-      setShapes(parsedShapes); // Update the shapes state
-      console.log("Updated shapes state:", parsedShapes); // Debug log
-      setCodeContent(JSON.stringify(parsedShapes, null, 2));
+      setCodeContent(JSON.stringify(json, null, 2)); // Update the JSON code
+      addClassesFromJson(json); // Render the shapes on the canvas
     } catch (error) {
-      console.error("Invalid JSON format:", error);
-      alert("Invalid JSON format. Please correct it and try again.");
+      console.error("Invalid JSON:", error);
     }
   };
-
+  let addClassesFromJson: (classesJson: any[]) => void;
   const handleDeleteShape = () => {
     if (selectedShape) {
       setShapes((prevShapes) =>
@@ -81,12 +77,13 @@ const Workspace: React.FC = () => {
             setZoom={setZoom}
             shapes={shapes} // Pass lifted state
             setShapes={setShapes} // Pass setter
+            addClassesFromJson={(fn) => (addClassesFromJson = fn)} 
           />
         </div>
 
         {/* Right Side Panel */}
         <DiagramRightSidebar
-          onAICreate={onAICreate} // Updated to handle JSON input
+          onAICreate={handleAICreate} // Updated to handle JSON input
           codeContent={codeContent} // Pass current JSON code
           className="col-span-3 h-screen border-r"
           updateCode={setCodeContent} // Update JSON code dynamically

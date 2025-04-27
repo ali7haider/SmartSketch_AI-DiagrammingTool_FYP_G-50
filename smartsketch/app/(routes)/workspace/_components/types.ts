@@ -9,15 +9,21 @@ export interface Shape {
     | "Dashed Line"
     | "Dotted Line"
     | "Directional Connector"
-    | "Bidirectional Connector";
+    | "Bidirectional Connector"
+    | "Class";   // 🆕 add this
   x: number;
   y: number;
   width?: number;
   height?: number;
   radius?: number;
   points?: number[];
-  cornerRadius?: number; // For rounded rectangles
   fill: string;
   stroke: string;
   strokeWidth: number;
+  cornerRadius?: number;
+
+  // 🆕 Add extra properties for class diagrams
+  className?: string;
+  attributes?: string[];
+  methods?: string[];
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Rect, Circle, Line, Arrow } from "react-konva";
+import { Group,Text,Rect, Circle, Line, Arrow } from "react-konva";
 import { Shape } from "./types";
 
 interface ShapeRendererProps {
@@ -97,6 +97,63 @@ const ShapeRenderer: React.FC<ShapeRendererProps> = ({
           pointerAtBeginning
           hitStrokeWidth={20}
         />
+      );
+      case "Class":
+      return (
+      <Group
+        key={shape.id}
+        x={shape.x}
+        y={shape.y}
+        draggable
+        onClick={() => handleShapeClick(shape.id)}
+        onDragMove={(e) => handleDragMove(index, e.target.x(), e.target.y())}
+        ref={(node) => {
+          shapeRefs.current[shape.id] = node;
+        }}
+      >
+        <Rect
+          width={shape.width}
+          height={shape.height}
+          fill="white"
+          stroke="black"
+          strokeWidth={2}
+          cornerRadius={5}
+        />
+        <Text
+          text={shape.className || ""}
+          fontSize={18}
+          fontStyle="bold"
+          width={shape.width}
+          align="center"
+          y={5}
+        />
+        <Rect
+          y={30}
+          width={shape.width}
+          height={1}
+          fill="black"
+        />
+        <Text
+          text={(shape.attributes || []).join("\n")}
+          fontSize={14}
+          width={shape.width}
+          padding={5}
+          y={35}
+        />
+        <Rect
+          y={80}
+          width={shape.width}
+          height={1}
+          fill="black"
+        />
+        <Text
+          text={(shape.methods || []).join("\n")}
+          fontSize={14}
+          width={shape.width}
+          padding={5}
+          y={85}
+        />
+      </Group>
       );
     default:
       return null;
