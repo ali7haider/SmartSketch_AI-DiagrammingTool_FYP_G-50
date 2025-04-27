@@ -4,6 +4,7 @@ import WorkSpaceHeader from "../_components/WorkSpaceHeader";
 import Canvas from "../_components/Canvas";
 import DiagramLeftSidebar from "../_components/DiagramLeftSidebar";
 import DiagramRightSidebar from "../_components/DiagramRightSidebar";
+import ExportDialog from "../_components/ExportDialog"; // Import it!
 
 const Workspace: React.FC = () => {
   const initialCanvasWidth = 800;
@@ -15,6 +16,7 @@ const Workspace: React.FC = () => {
   const convex = 1;
   const [codeContent, setCodeContent] = useState<string>("{}");
   const [fileData, setFileData] = useState<false>();
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   const handleZoomIn = () => {
     setZoom((prevZoom) => Math.min(prevZoom + 0.1, 2)); // Limit zoom-in
@@ -46,19 +48,63 @@ const Workspace: React.FC = () => {
     }
   };
 
+  const handleExportAsPNG = (fileName: string, transparent: boolean) => {
+    const canvasElement = document.querySelector("canvas") as HTMLCanvasElement;
+    if (!canvasElement) return;
+
+    const ctx = canvasElement.getContext("2d");
+    if (!ctx) return;
+
+    if (!transparent) {
+      // Save current content
+      const currentData = ctx.getImageData(
+        0,
+        0,
+        canvasElement.width,
+        canvasElement.height
+      );
+
+      // Draw white background
+      ctx.globalCompositeOperation = "destination-over";
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+
+      // Export
+      const dataURL = canvasElement.toDataURL("image/png");
+      downloadImage(dataURL, fileName);
+
+      // Restore
+      ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      ctx.putImageData(currentData, 0, 0);
+      ctx.globalCompositeOperation = "source-over";
+    } else {
+      // Export with transparency
+      const dataURL = canvasElement.toDataURL("image/png");
+      downloadImage(dataURL, fileName);
+    }
+  };
+
+  const downloadImage = (dataURL: string, fileName: string) => {
+    const link = document.createElement("a");
+    link.href = dataURL;
+    link.download = fileName;
+    link.click();
+  };
+
   return (
     <div className="p-0">
       {/* Workspace Header */}
       <WorkSpaceHeader
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
-        onDelete={handleDeleteShape} // Updated delete
+        onDelete={handleDeleteShape}
+        onRequestExport={() => setShowExportDialog(true)} // 👈 pass this new prop
       />
 
       {/* Workspace Layout */}
-      <div className="grid grid-cols-12 relative">
+      <div className="grid grid-cols-12">
         {/* Left Side Panel */}
-        <div className="col-span-2 h-screen border-l relative z-10">
+        <div className="col-span-2 h-screen border-l">
           <DiagramLeftSidebar
             onShapeSelect={setSelectedShape}
             className="col-span-2 h-screen border-r"
@@ -87,6 +133,12 @@ const Workspace: React.FC = () => {
           codeContent={codeContent}
           updateCode={(newCode) => setCodeContent(newCode)}
         />
+        {showExportDialog && (
+          <ExportDialog
+            onExport={handleExportAsPNG}
+            onClose={() => setShowExportDialog(false)}
+          />
+        )}
       </div>
     </div>
   );
