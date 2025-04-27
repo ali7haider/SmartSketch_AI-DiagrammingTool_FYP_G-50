@@ -23,6 +23,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "convex": "^1.17.3",
+    "jspdf": "^3.0.1",
     "konva": "^9.3.16",
     "lucide-react": "^0.447.0",
     "moment": "^2.30.1",

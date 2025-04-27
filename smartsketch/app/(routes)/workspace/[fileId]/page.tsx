@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { jsPDF } from "jspdf";
 import WorkSpaceHeader from "../_components/WorkSpaceHeader";
 import Canvas from "../_components/Canvas";
 import DiagramLeftSidebar from "../_components/DiagramLeftSidebar";
@@ -136,10 +137,10 @@ const Workspace: React.FC = () => {
     // This would require jsPDF or similar library
     console.log("PDF export would be implemented here");
     // Example with jsPDF:
-    // const imgData = canvas.toDataURL('image/jpeg');
-    // const pdf = new jsPDF();
-    // pdf.addImage(imgData, 'JPEG', 0, 0);
-    // pdf.save(fileName);
+    const imgData = canvas.toDataURL("image/jpeg");
+    const pdf = new jsPDF();
+    pdf.addImage(imgData, "JPEG", 0, 0, canvas.width, canvas.height);
+    pdf.save(fileName);
   };
   const downloadImage = (dataURL: string, fileName: string) => {
     const link = document.createElement("a");
