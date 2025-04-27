@@ -185,6 +185,68 @@ const Canvas: React.FC<CanvasProps> = ({
         stroke: "black",
         strokeWidth: 2,
       });
+    } else if (selectedShape === "Text") {
+      addShape({
+        id: uuidv4(),
+        type: "Text",
+        x,
+        y,
+        text: "Double click to edit",
+        fontSize: 16,
+        fill: "black",
+        width: 150,
+        height: 30,
+      });
+    } else if (selectedShape === "Heading") {
+      addShape({
+        id: uuidv4(),
+        type: "Heading",
+        x,
+        y,
+        text: "Heading",
+        fontSize: 24,
+        fill: "black",
+        fontWeight: "bold",
+        width: 200,
+        height: 40,
+      });
+    } else if (selectedShape === "Ellipse") {
+      addShape({
+        id: uuidv4(),
+        type: "Ellipse",
+        x,
+        y,
+        radiusX: 50,
+        radiusY: 30,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+      });
+    } else if (selectedShape === "Diamond") {
+      addShape({
+        id: uuidv4(),
+        type: "Diamond",
+        x,
+        y,
+        width: 80,
+        height: 60,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+      });
+    } else if (selectedShape === "Parallelogram") {
+      // addShape({
+      //   id: uuidv4(),
+      //   type: "Parallelogram",
+      //   x,
+      //   y,
+      //   width: 100,
+      //   height: 60,
+      //   skewX: 20,
+      //   fill: "white",
+      //   stroke: "black",
+      //   strokeWidth: 1,
+      // });
     }
     const selectedNode = shapeRefs.current[selectedShape || ""];
 
