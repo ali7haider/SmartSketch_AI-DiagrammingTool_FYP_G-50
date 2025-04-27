@@ -15,7 +15,9 @@ interface WorkspaceHeaderProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onDelete: () => void;
-  onRequestExport: () => void;
+  onRequestExport: (options: {
+    type: "png" | "jpeg" | "webp" | "svg" | "pdf";
+  }) => void;
 }
 
 const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
@@ -117,51 +119,14 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
                     <div className="group relative">
                       <a
                         href="#"
-                        className="px-4 py-2 text-sm hover:bg-gray-100 flex justify-between items-center"
+                        className="block px-4 py-2 text-sm hover:bg-gray-100"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onRequestExport({ type: "png" }); // Just open the export dialog
+                        }}
                       >
-                        Export as
-                        <span className="ml-2">&#9654;</span>{" "}
-                        {/* Right arrow */}
+                        Export as...
                       </a>
-                      {/* Submenu */}
-                      <div className="hidden group-hover:block absolute left-full top-0 w-40 bg-white shadow-lg rounded-md ring-1 ring-black ring-opacity-5 z-50">
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-sm hover:bg-gray-100"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            onRequestExport(); // open the dialog from here
-                          }}
-                        >
-                          PNG
-                        </a>
-
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-sm hover:bg-gray-100"
-                        >
-                          JPEG
-                        </a>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-sm hover:bg-gray-100"
-                        >
-                          WebP
-                        </a>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-sm hover:bg-gray-100"
-                        >
-                          SVG
-                        </a>
-                        <hr className="my-1 border-gray-300" />
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-sm hover:bg-gray-100"
-                        >
-                          PDF
-                        </a>
-                      </div>
                     </div>
 
                     <hr className="my-1 border-gray-300" />
