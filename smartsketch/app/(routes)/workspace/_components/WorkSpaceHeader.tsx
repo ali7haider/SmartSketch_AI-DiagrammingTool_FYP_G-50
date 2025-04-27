@@ -26,11 +26,36 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
   onDelete,
   onRequestExport, // <-- Add this prop
 }) => {
-  const [isFileMenuOpen, setIsFileMenuOpen] = useState(false); // <-- State for dropdown
+  const [isFileMenuOpen, setIsFileMenuOpen] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [showRenameDialog, setShowRenameDialog] = useState(false);
+  const [diagramName, setDiagramName] = useState("Current Diagram");
+  const [tempDiagramName, setTempDiagramName] = useState("Current Diagram");
 
   const toggleFileMenu = () => setIsFileMenuOpen(!isFileMenuOpen);
-  const closeFileMenu = () => setIsFileMenuOpen(false); // optional: close when clicking elsewhere (advanced later)
+  const closeFileMenu = () => setIsFileMenuOpen(false);
 
+  const handleSave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsSaved(true);
+  };
+
+  const handleRenameClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setTempDiagramName(diagramName);
+    setShowRenameDialog(true);
+    closeFileMenu();
+  };
+
+  const handleRenameConfirm = () => {
+    setDiagramName(tempDiagramName);
+    setShowRenameDialog(false);
+    setIsSaved(false); // Mark as unsaved since we made a change
+  };
+
+  const handleRenameCancel = () => {
+    setShowRenameDialog(false);
+  };
   return (
     <header className="bg-gray-100 border-b shadow-md">
       {/* Top Navbar */}
@@ -48,7 +73,7 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
         <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 pt-6">
           <div className="flex px-6 items-center gap-4">
             <h1 className="text-lg font-semibold text-gray-700">
-              Current Diagram
+              {diagramName}
             </h1>
           </div>
         </div>
@@ -84,6 +109,7 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
                     <a
                       href="#"
                       className="block px-4 py-2 text-sm hover:bg-gray-100"
+                      onClick={handleSave} // Add onClick handler
                     >
                       Save
                     </a>
@@ -104,6 +130,7 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
                     <a
                       href="#"
                       className="block px-4 py-2 text-sm hover:bg-gray-100"
+                      onClick={handleRenameClick}
                     >
                       Rename
                     </a>
@@ -161,7 +188,9 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
             <a href="#" className="hover:text-teal-600">
               Help
             </a>
-            <span className="text-sm text-gray-500">(Unsaved Changes)</span>
+            <span className="text-sm text-gray-500">
+              {isSaved ? "Saved changes" : "Unsaved changes"}
+            </span>
           </nav>
         </div>
       </div>
@@ -197,6 +226,38 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
       </div>
 
       <hr className="border-gray-300" />
+
+      {showRenameDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <h2 className="text-xl font-bold mb-4">Rename Diagram</h2>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">New Name</label>
+              <input
+                type="text"
+                value={tempDiagramName}
+                onChange={(e) => setTempDiagramName(e.target.value)}
+                className="w-full p-2 border rounded"
+                autoFocus
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={handleRenameCancel}
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRenameConfirm}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
