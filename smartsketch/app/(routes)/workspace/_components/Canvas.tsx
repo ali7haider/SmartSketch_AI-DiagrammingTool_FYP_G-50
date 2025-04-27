@@ -1,11 +1,8 @@
 import React, { useEffect } from "react";
-import { Stage, Layer, Line, Rect, Circle, Arrow } from "react-konva";
+import { Stage, Layer, Line, Arrow, Transformer } from "react-konva";
 import { v4 as uuidv4 } from "uuid";
-import { Transformer } from "react-konva";
-import Konva from "konva";
 import { Shape } from "./types";
 import ShapeRenderer from "./ShapeRenderer";
-
 
 interface CanvasProps {
   selectedShape: string | null;
@@ -36,23 +33,70 @@ const Canvas: React.FC<CanvasProps> = ({
   const [canvasWidth, setCanvasWidth] = React.useState(initialCanvasWidth);
   const [canvasHeight, setCanvasHeight] = React.useState(initialCanvasHeight);
 
-  // Function to add classes from JSON
+  // Function to render relationships
+  const renderRelationships = () => {
+    console.log("Shapes state:", shapes); // Debug log
+    return shapes
+      .filter((shape) => shape.type === "relationship")
+      .map((relationship, index) => {
+        const fromShape = shapes.find((shape) => shape.id === relationship.from);
+        const toShape = shapes.find((shape) => shape.id === relationship.to);
+  
+        if (!fromShape || !toShape) {
+          console.warn("Missing shapes for relationship:", relationship); // Debug log
+          return null;
+        }
+  
+        const fromX = fromShape.x + (fromShape.width ?? 0) / 2;
+        const fromY = fromShape.y + (fromShape.height ?? 0) / 2;
+        const toX = toShape.x + (toShape.width ?? 0) / 2;
+        const toY = toShape.y + (toShape.height ?? 0) / 2;
+  
+        console.log(`Drawing arrow from (${fromX}, ${fromY}) to (${toX}, ${toY})`); // Debug log
+  
+        return (
+          <Arrow
+            key={`relationship-${index}`}
+            points={[fromX+100, fromY, toX-100, toY]}
+            stroke="black"
+            fill="black"
+            pointerLength={10}
+            pointerWidth={10}
+          />
+        );
+      });
+  };
+  // Function to add classes and relationships from JSON
   const addClassesFromJsonInternal = (classesJson: any[]) => {
-    const newShapes: Shape[] = classesJson.map((cls) => ({
-      id: uuidv4(),
-      type: "Class",
-      x: cls.x,
-      y: cls.y,
-      width: cls.width,
-      height: cls.height,
-      fill: "white",
-      stroke: "black",
-      strokeWidth: 2,
-      className: cls.className,
-      attributes: cls.attributes,
-      methods: cls.methods,
-    }));
-
+    const newShapes: Shape[] = classesJson.map((cls) => {
+      if (cls.type === "relationship") {
+        console.log("Adding relationship:", cls); // Debug log
+        return {
+          ...cls, // Preserve the relationship object as is
+          id: uuidv4(), // Generate a unique ID for the relationship
+        };
+      }
+  
+  
+  
+      // Preserve the original `id` for class shapes
+      return {
+        id: cls.id, // Use the existing `id` from the JSON
+        type: "Class",
+        x: cls.x,
+        y: cls.y,
+        width: cls.width,
+        height: cls.height,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 2,
+        className: cls.className,
+        attributes: cls.attributes,
+        methods: cls.methods,
+      };
+    });
+  
+    console.log("New shapes added:", newShapes); // Debug log
     setShapes((prev) => [...prev, ...newShapes]);
   };
 
@@ -100,6 +144,128 @@ const Canvas: React.FC<CanvasProps> = ({
   useEffect(() => {
     setGridLines(generateGridLines(canvasWidth, canvasHeight));
   }, [canvasWidth, canvasHeight]);
+  useEffect(() => {
+    const getRandomOffset = (range: number) =>
+      Math.random() * range * 2 - range;
+
+    const addShape = (shape: Shape) => {
+      setShapes((prevShapes) => [...prevShapes, shape]);
+      setSelectedShape(null);
+    };
+
+    const x = canvasWidth / 2 + getRandomOffset(50);
+    const y = canvasHeight / 2 + getRandomOffset(50);
+
+    if (selectedShape === "Rectangle") {
+      addShape({
+        id: uuidv4(),
+        type: "Rectangle",
+        x,
+        y,
+        width: 100,
+        height: 60,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+      });
+    } else if (selectedShape === "Round Rectangle") {
+      addShape({
+        id: uuidv4(),
+        type: "Round Rectangle",
+        x,
+        y,
+        width: 100,
+        height: 60,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+      });
+    } else if (selectedShape === "Circle") {
+      addShape({
+        id: uuidv4(),
+        type: "Circle",
+        x,
+        y,
+        radius: 40,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+      });
+    } else if (selectedShape === "Square") {
+      addShape({
+        id: uuidv4(),
+        type: "Square",
+        x,
+        y,
+        width: 60,
+        height: 60,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+      });
+    } else if (selectedShape === "Line") {
+      addShape({
+        id: uuidv4(),
+        type: "Line",
+        points: [0, 0, 100, 0],
+        x,
+        y,
+        fill: "",
+        stroke: "black",
+        strokeWidth: 2,
+      });
+    } else if (selectedShape === "Dashed Line") {
+      addShape({
+        id: uuidv4(),
+        type: "Dashed Line",
+        points: [0, 0, 100, 0], // ✅ relative coordinates
+        x,
+        y,
+        fill: "",
+        stroke: "black",
+        strokeWidth: 2,
+      });
+    } else if (selectedShape === "Dotted Line") {
+      addShape({
+        id: uuidv4(),
+        type: "Dotted Line",
+        points: [0, 0, 100, 0], // ✅ relative coordinates
+        x,
+        y,
+        fill: "",
+        stroke: "black",
+        strokeWidth: 2,
+      });
+    } else if (selectedShape === "Directional Connector") {
+      addShape({
+        id: uuidv4(),
+        type: "Directional Connector",
+        points: [0, 0, 100, 0], // ✅ relative coordinates
+        x,
+        y,
+        fill: "",
+        stroke: "black",
+        strokeWidth: 2,
+      });
+    } else if (selectedShape === "Bidirectional Connector") {
+      addShape({
+        id: uuidv4(),
+        type: "Bidirectional Connector",
+        points: [0, 0, 100, 0], // ✅ relative coordinates
+        x,
+        y,
+        fill: "",
+        stroke: "black",
+        strokeWidth: 2,
+      });
+    }
+    const selectedNode = shapeRefs.current[selectedShape || ""];
+
+    if (selectedNode && transformerRef.current) {
+      transformerRef.current.nodes([selectedNode]);
+      transformerRef.current.getLayer()?.batchDraw();
+    }
+  }, [selectedShape, canvasWidth, canvasHeight, setShapes, setSelectedShape]);
 
   const handleShapeClick = (id: string) => {
     setSelectedShape(id);
@@ -136,7 +302,7 @@ const Canvas: React.FC<CanvasProps> = ({
     setCanvasWidth(newCanvasWidth);
     setCanvasHeight(newCanvasHeight);
   };
-
+  
   const handleCanvasClick = (e: any) => {
     const clickedShape = e.target;
     console.log("Clicked Target:", clickedShape);
@@ -175,17 +341,21 @@ const Canvas: React.FC<CanvasProps> = ({
         >
           <Layer>
             {gridLines}
-            {shapes.map((shape, index) => (
-              <ShapeRenderer
-                key={shape.id}
-                shape={shape}
-                index={index}
-                isSelected={selectedShape === shape.id}
-                handleShapeClick={handleShapeClick}
-                handleDragMove={handleDragMove}
-                shapeRefs={shapeRefs}
-              />
-            ))}
+            {shapes
+
+              .map((shape, index) => (
+                <ShapeRenderer
+                  key={shape.id}
+                  shape={shape}
+                  index={index}
+                  isSelected={selectedShape === shape.id}
+                  handleShapeClick={handleShapeClick}
+                  handleDragMove={handleDragMove}
+                  shapeRefs={shapeRefs}
+                />
+              ))}
+
+            {renderRelationships()}
 
             {selectedShape && shapeRefs.current[selectedShape] && (
               <Transformer

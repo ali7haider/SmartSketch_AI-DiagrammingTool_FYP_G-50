@@ -10,7 +10,8 @@ export interface Shape {
     | "Dotted Line"
     | "Directional Connector"
     | "Bidirectional Connector"
-    | "Class";   // 🆕 add this
+    | "Class"
+    | "relationship";   // 🆕 add this
   x: number;
   y: number;
   width?: number;
@@ -26,4 +27,6 @@ export interface Shape {
   className?: string;
   attributes?: string[];
   methods?: string[];
+  from?: string; // For relationships
+  to?: string;   // For relationships
 }

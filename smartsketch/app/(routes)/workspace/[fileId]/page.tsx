@@ -11,6 +11,7 @@ const Workspace: React.FC = () => {
   const [selectedShape, setSelectedShape] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1); // Initialize zoom state
   const [triggerSave, setTriggerSave] = useState(false);
+  const convex = 1;
   const [shapes, setShapes] = useState<any[]>([]); // Lifted shape state
   const [codeContent, setCodeContent] = useState<string>("{}");
   const [fileData, setFileData] = useState<false>();
