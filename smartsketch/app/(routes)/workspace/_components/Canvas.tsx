@@ -333,6 +333,7 @@ const Canvas: React.FC<CanvasProps> = ({
         }}
       >
         <Stage
+          canvas id="canvas"
           width={canvasWidth}
           height={canvasHeight}
           scaleX={zoom}
