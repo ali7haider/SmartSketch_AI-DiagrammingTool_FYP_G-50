@@ -271,25 +271,51 @@ const Canvas: React.FC<CanvasProps> = ({
       return updatedShapes;
     });
 
-    let newCanvasWidth = canvasWidth;
-    let newCanvasHeight = canvasHeight;
-
     const shape = shapes[index];
-    if (shape.x + (shape.width || shape.radius || 0) > canvasWidth) {
-      newCanvasWidth = shape.x + (shape.width || shape.radius || 0) + padding;
-    }
-    if (shape.x < 0) {
-      newCanvasWidth = canvasWidth + Math.abs(shape.x) + padding;
-    }
-    if (shape.y + (shape.height || shape.radius || 0) > canvasHeight) {
-      newCanvasHeight = shape.y + (shape.height || shape.radius || 0) + padding;
-    }
-    if (shape.y < 0) {
-      newCanvasHeight = canvasHeight + Math.abs(shape.y) + padding;
-    }
+    const shapeRight = newX + (shape.width || shape.radius || 0);
+    const shapeBottom = newY + (shape.height || shape.radius || 0);
 
-    setCanvasWidth(newCanvasWidth);
-    setCanvasHeight(newCanvasHeight);
+    // Calculate required canvas dimensions with padding
+    const requiredWidth = Math.max(
+      initialCanvasWidth, // Minimum width
+      shapeRight + padding,
+      ...shapes.map((s) => s.x + (s.width || s.radius || 0) + padding)
+    );
+
+    const requiredHeight = Math.max(
+      initialCanvasHeight, // Minimum height
+      shapeBottom + padding,
+      ...shapes.map((s) => s.y + (s.height || s.radius || 0) + padding)
+    );
+
+    // Calculate if we need to shrink the canvas
+    const allShapeRight = Math.max(
+      ...shapes.map((s) => s.x + (s.width || s.radius || 0))
+    );
+    const allShapeBottom = Math.max(
+      ...shapes.map((s) => s.y + (s.height || s.radius || 0))
+    );
+
+    const shrinkWidth = allShapeRight + padding * 2 < canvasWidth;
+    const shrinkHeight = allShapeBottom + padding * 2 < canvasHeight;
+
+    // Use smooth transitions when resizing
+    const newWidth = shrinkWidth
+      ? Math.max(initialCanvasWidth, allShapeRight + padding * 2)
+      : requiredWidth;
+
+    const newHeight = shrinkHeight
+      ? Math.max(initialCanvasHeight, allShapeBottom + padding * 2)
+      : requiredHeight;
+
+    // Only update if there's a significant change (for performance)
+    if (
+      Math.abs(newWidth - canvasWidth) > 10 ||
+      Math.abs(newHeight - canvasHeight) > 10
+    ) {
+      setCanvasWidth(newWidth);
+      setCanvasHeight(newHeight);
+    }
   };
 
   const handleCanvasClick = (e: any) => {
@@ -304,25 +330,20 @@ const Canvas: React.FC<CanvasProps> = ({
 
   return (
     <div
+      className="absolute inset-0 overflow-auto"
       style={{
-        width: "100%",
-        height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        overflow: "auto",
-        position: "relative",
-        padding: `${padding}px`,
-        boxSizing: "border-box",
-        backgroundColor: "#FBFBFB",
       }}
     >
       <div
         style={{
+          position: "relative",
+          transition: "width 0.2s ease-out, height 0.2s ease-out",
           width: `${canvasWidth}px`,
           height: `${canvasHeight}px`,
-          position: "relative",
-          backgroundColor: "#fff",
+          backgroundColor: "#FBFBFB",
         }}
       >
         <Stage
@@ -331,7 +352,9 @@ const Canvas: React.FC<CanvasProps> = ({
           scaleX={zoom}
           scaleY={zoom}
           style={{ border: "1px solid #ccc" }}
-          onClick={handleCanvasClick} // Moved the click handler here
+          onClick={handleCanvasClick}
+          offsetX={-Math.min(0, ...shapes.map((s) => s.x - padding))}
+          offsetY={-Math.min(0, ...shapes.map((s) => s.y - padding))}
         >
           <Layer>
             {gridLines}
@@ -347,12 +370,10 @@ const Canvas: React.FC<CanvasProps> = ({
               />
             ))}
 
-            {/* Add Transformer at the end */}
             {selectedShape && shapeRefs.current[selectedShape] && (
               <Transformer
                 ref={transformerRef}
                 boundBoxFunc={(oldBox, newBox) => {
-                  // Prevent resizing smaller than 5x5
                   if (newBox.width < 5 || newBox.height < 5) {
                     return oldBox;
                   }

@@ -169,15 +169,17 @@ const Workspace: React.FC = () => {
           />
         </div>
         {/* Whiteboard/Canvas */}
-        <div className="col-span-7 h-screen border-l border-r">
-          <Canvas
-            selectedShape={selectedShape}
-            setSelectedShape={setSelectedShape}
-            zoom={zoom}
-            setZoom={setZoom}
-            shapes={shapes} // Pass lifted state
-            setShapes={setShapes} // Pass setter
-          />
+        <div className="col-span-7 h-screen border-l border-r relative overflow-hidden">
+          <div className="absolute inset-0 overflow-auto">
+            <Canvas
+              selectedShape={selectedShape}
+              setSelectedShape={setSelectedShape}
+              zoom={zoom}
+              setZoom={setZoom}
+              shapes={shapes}
+              setShapes={setShapes}
+            />
+          </div>
         </div>
         {/* Right Side Panel */}
         <DiagramRightSidebar
@@ -189,6 +191,7 @@ const Workspace: React.FC = () => {
           codeContent={codeContent}
           updateCode={(newCode) => setCodeContent(newCode)}
         />
+        // In Workspace component's render method:
         {showExportDialog && (
           <ExportDialog
             onExport={handleExport}
