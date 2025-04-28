@@ -57,7 +57,7 @@ const Canvas: React.FC<CanvasProps> = ({
         return (
           <Arrow
             key={`relationship-${index}`}
-            points={[fromX+100, fromY, toX-100, toY]}
+            points={[fromX+100, fromY-73, toX-100, toY-70]}
             stroke="black"
             fill="black"
             pointerLength={10}

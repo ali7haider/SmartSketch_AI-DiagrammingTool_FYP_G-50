@@ -17,7 +17,7 @@ app.add_middleware(
 
 # Load API key from environment variable
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "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"
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 MODEL_NAME = "llama3-8b-8192"
 
@@ -104,7 +104,7 @@ async def call_groq_api(prompt: str) -> str:
         "model": MODEL_NAME,
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.2,
-        "max_tokens": 2048
+        "max_tokens": 3048
     }
 
     response = requests.post(GROQ_API_URL, headers=headers, json=payload)
