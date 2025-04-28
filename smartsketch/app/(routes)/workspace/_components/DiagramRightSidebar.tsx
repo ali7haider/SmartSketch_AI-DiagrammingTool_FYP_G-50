@@ -27,6 +27,34 @@ const DiagramRightSidebar: React.FC<DiagramRightSidebarProps> = ({
       alert("Invalid JSON format. Please correct it and try again.");
     }
   };
+  const handleGenerateDiagram = async () => {
+    if (!aiInput.trim()) {
+      alert("Please enter a description for the diagram.");
+      return;
+    }
+    
+    try {
+      console.log("prompt: ",aiInput); // Debug log
+      const response = await fetch("http://127.0.0.1:5000/generate-diagram/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: aiInput }), // Ensure `aiInput` contains the prompt
+    });
+          
+      const data = await response.json();
+      console.log("handleGenerateDiagram called",data); // Debug log
+  
+      if (data.diagram_json) {
+        updateCode(JSON.stringify(data.diagram_json, null, 2)); // Update the JSON code in the Code tab
+        onAICreate(data.diagram_json); // Render the diagram on the canvas
+      } else {
+        alert("Failed to generate the diagram. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error generating diagram:", error);
+      alert("An error occurred while generating the diagram.");
+    }
+  };
 
   return (
     <div
@@ -64,12 +92,9 @@ const DiagramRightSidebar: React.FC<DiagramRightSidebarProps> = ({
             />
             <button
               className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded shadow"
-              onClick={() => {
-                setAiInput(""); // Clear the AI input
-                updateCode(aiInput); // Update the code content
-              }}
+              onClick={handleGenerateDiagram}
             >
-              Apply Changes
+              Generate Diagram
             </button>
           </div>
         )}

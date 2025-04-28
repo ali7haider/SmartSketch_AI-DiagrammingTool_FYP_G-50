@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
 import json
@@ -6,9 +7,17 @@ import os
 import asyncio
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Allow requests from your frontend
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Load API key from environment variable
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = "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"
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 MODEL_NAME = "llama3-8b-8192"
 
@@ -23,6 +32,57 @@ RULES:
 - Do NOT include ```json blocks.
 - Ensure proper closing brackets, valid JSON syntax.
 - Follow standard JSON formatting (double quotes, commas, etc.).
+- Use the following JSON structure:
+[
+  {{
+    "id": "class1",
+    "x": 100,
+    "y": 100,
+    "width": 200,
+    "height": 150,
+    "className": "Person",
+    "attributes": ["+ name: String", "+ age: Int"],
+    "methods": ["+ greet(): void"]
+  }},
+  {{
+    "id": "class2",
+    "x": 400,
+    "y": 100,
+    "width": 200,
+    "height": 150,
+    "className": "Student",
+    "attributes": ["+ studentId: String"],
+    "methods": ["+ study(): void"]
+  }},
+  {{
+    "id": "class3",
+    "x": 400,
+    "y": 300,
+    "width": 200,
+    "height": 150,
+    "className": "Teacher",
+    "attributes": ["+ employeeId: String"],
+    "methods": ["+ teach(): void"]
+  }},
+  {{
+    "type": "relationship",
+    "from": "class1",
+    "to": "class2",
+    "relationshipType": "inheritance"
+  }},
+  {{
+    "type": "relationship",
+    "from": "class1",
+    "to": "class3",
+    "relationshipType": "inheritance"
+  }}
+]
+
+ADDITIONAL RULES:
+- Each class must have an `id`, `x`, `y`, `width`, `height`, `className`, `attributes`, and `methods`.
+- Relationships must include `type`, `from`, `to`, and `relationshipType`.
+- Do NOT include nodes or edges in the JSON.
+- Ensure all relationships are valid and reference existing class IDs.
 
 Here is the user prompt:
 
@@ -30,7 +90,6 @@ Here is the user prompt:
 
 Respond now with the JSON ONLY:
 """
-
 # Define request body
 class PromptRequest(BaseModel):
     prompt: str
@@ -85,7 +144,12 @@ async def generate_valid_json(prompt: str, max_retries: int = 3) -> str:
     raise HTTPException(status_code=500, detail="Failed to generate valid JSON after retries.")
 
 # API endpoint
-@app.post("/generate-diagram/")
-async def generate_diagram(data: PromptRequest):
+@app.api_route("/generate-diagram/", methods=["GET", "POST"])
+async def generate_diagram(data: PromptRequest = None):
+    if data is None:
+        raise HTTPException(status_code=400, detail="Prompt is required.")
+
+    print(f"Received prompt: {data.prompt}")
     diagram_json = await generate_valid_json(data.prompt)
+    print(f"Generated JSON: {diagram_json}")
     return {"diagram_json": json.loads(diagram_json)}
