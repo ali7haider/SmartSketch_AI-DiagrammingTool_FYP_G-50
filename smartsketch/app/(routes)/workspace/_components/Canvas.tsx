@@ -293,11 +293,13 @@ const Canvas: React.FC<CanvasProps> = ({
   };
 
   const handleCanvasClick = (e: any) => {
-    // e.target is the node that was clicked; ensure it's a Konva node and not the canvas itself.
-    const clickedShape = e.target;
-
-    // Log the clicked target to debug
-    console.log("Clicked Target:", clickedShape);
+    const stage = e.target.getStage();
+    // Check if we clicked directly on the stage (empty space)
+    if (e.target === stage) {
+      setSelectedShape(null);
+      transformerRef.current?.nodes([]);
+      stage.batchDraw();
+    }
   };
 
   return (
@@ -314,7 +316,6 @@ const Canvas: React.FC<CanvasProps> = ({
         boxSizing: "border-box",
         backgroundColor: "#FBFBFB",
       }}
-      onClick={handleCanvasClick} // Added canvas click handler here
     >
       <div
         style={{
@@ -330,6 +331,7 @@ const Canvas: React.FC<CanvasProps> = ({
           scaleX={zoom}
           scaleY={zoom}
           style={{ border: "1px solid #ccc" }}
+          onClick={handleCanvasClick} // Moved the click handler here
         >
           <Layer>
             {gridLines}
