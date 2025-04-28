@@ -369,6 +369,8 @@ const Canvas: React.FC<CanvasProps> = ({
                 handleShapeClick={handleShapeClick}
                 handleDragMove={handleDragMove}
                 shapeRefs={shapeRefs}
+                onConnectionHandleDrag={() => {}}
+                onConnectionHandleDragEnd={() => {}}
               />
             ))}
 
