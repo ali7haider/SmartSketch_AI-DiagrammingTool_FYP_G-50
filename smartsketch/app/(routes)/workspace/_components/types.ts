@@ -1,3 +1,8 @@
+export interface ConnectionPoint {
+  x: number;
+  y: number;
+  connectedTo?: string; // ID of the shape this point is connected to
+}
 export type Shape = {
   id: string;
   type: string;
@@ -9,6 +14,10 @@ export type Shape = {
   fill?: string;
   stroke?: string;
   strokeWidth?: number;
+  connectionPoints?: {
+    start: ConnectionPoint;
+    end: ConnectionPoint;
+  };
 
   // Rectangle/Square specific
   cornerRadius?: number; // For rounded rectangles

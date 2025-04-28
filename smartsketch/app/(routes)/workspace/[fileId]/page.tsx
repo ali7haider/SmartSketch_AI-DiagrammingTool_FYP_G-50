@@ -189,7 +189,6 @@ const Workspace: React.FC = () => {
           codeContent={codeContent}
           updateCode={(newCode) => setCodeContent(newCode)}
         />
-        // In Workspace component's render method:
         {showExportDialog && (
           <ExportDialog
             onExport={handleExport}

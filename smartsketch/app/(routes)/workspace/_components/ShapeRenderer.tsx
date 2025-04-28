@@ -1,6 +1,7 @@
 import React from "react";
 import { Rect, Circle, Line, Arrow, Text, Ellipse } from "react-konva";
 import { Shape } from "./types";
+import ConnectionHandle from "./ConnectionHandle";
 
 interface ShapeRendererProps {
   shape: Shape;
@@ -9,6 +10,16 @@ interface ShapeRendererProps {
   handleShapeClick: (id: string) => void;
   handleDragMove: (index: number, x: number, y: number) => void;
   shapeRefs: React.MutableRefObject<Record<string, any>>;
+  onConnectionHandleDrag: (
+    index: number,
+    type: "start" | "end",
+    pos: { x: number; y: number }
+  ) => void;
+  onConnectionHandleDragEnd: (
+    index: number,
+    type: "start" | "end",
+    targetShapeId?: string
+  ) => void;
 }
 
 const ShapeRenderer: React.FC<ShapeRendererProps> = ({
@@ -18,21 +29,136 @@ const ShapeRenderer: React.FC<ShapeRendererProps> = ({
   handleShapeClick,
   handleDragMove,
   shapeRefs,
+  onConnectionHandleDrag,
+  onConnectionHandleDragEnd,
 }) => {
+  const isConnector = [
+    "Line",
+    "Dashed Line",
+    "Dotted Line",
+    "Directional Connector",
+    "Bidirectional Connector",
+  ].includes(shape.type);
+
+  const renderConnector = () => {
+    // Use absolute coordinates for connection points
+    const startX = shape.connectionPoints?.start?.x ?? shape.x;
+    const startY = shape.connectionPoints?.start?.y ?? shape.y;
+    const endX = shape.connectionPoints?.end?.x ?? shape.x + 100;
+    const endY = shape.connectionPoints?.end?.y ?? shape.y;
+
+    return (
+      <>
+        {shape.type.includes("Connector") ? (
+          <Arrow
+            points={[startX, startY, endX, endY]}
+            stroke={isSelected ? "#3b82f6" : shape.stroke || "black"}
+            strokeWidth={isSelected ? 3 : shape.strokeWidth || 2}
+            pointerLength={10}
+            pointerWidth={10}
+            pointerAtBeginning={shape.type === "Bidirectional Connector"}
+            pointerAtEnding={true}
+            dash={
+              shape.type === "Dashed Line"
+                ? [10, 5]
+                : shape.type === "Dotted Line"
+                  ? [2, 4]
+                  : undefined
+            }
+            draggable
+            onClick={(e) => {
+              e.cancelBubble = true;
+              handleShapeClick(shape.id);
+            }}
+            onDragStart={(e) => {
+              e.cancelBubble = true;
+            }}
+            onDragMove={(e) => {
+              handleDragMove(index, e.target.x(), e.target.y());
+            }}
+            name={shape.id}
+          />
+        ) : (
+          <Line
+            points={[startX, startY, endX, endY]}
+            stroke={isSelected ? "#3b82f6" : shape.stroke || "black"}
+            strokeWidth={isSelected ? 3 : shape.strokeWidth || 2}
+            dash={
+              shape.type === "Dashed Line"
+                ? [10, 5]
+                : shape.type === "Dotted Line"
+                  ? [2, 4]
+                  : undefined
+            }
+            draggable
+            onClick={(e) => {
+              e.cancelBubble = true;
+              handleShapeClick(shape.id);
+            }}
+            onDragStart={(e) => {
+              e.cancelBubble = true;
+            }}
+            onDragMove={(e) => {
+              handleDragMove(index, e.target.x(), e.target.y());
+            }}
+            name={shape.id}
+          />
+        )}
+
+        {isSelected && (
+          <>
+            <ConnectionHandle
+              x={startX}
+              y={startY}
+              type="start"
+              isVisible={true}
+              onDragMove={(pos) => onConnectionHandleDrag(index, "start", pos)}
+              onDragEnd={(e) => {
+                const target = e.target
+                  .getStage()
+                  ?.getIntersection(e.target.position());
+                onConnectionHandleDragEnd(index, "start", target?.name());
+              }}
+            />
+            <ConnectionHandle
+              x={endX}
+              y={endY}
+              type="end"
+              isVisible={true}
+              onDragMove={(pos) => onConnectionHandleDrag(index, "end", pos)}
+              onDragEnd={(e) => {
+                const target = e.target
+                  .getStage()
+                  ?.getIntersection(e.target.position());
+                onConnectionHandleDragEnd(index, "end", target?.name());
+              }}
+            />
+          </>
+        )}
+      </>
+    );
+  };
   const commonProps = {
     key: shape.id,
     x: shape.x,
     y: shape.y,
-    stroke: shape.stroke,
-    strokeWidth: isSelected ? 3 : shape.strokeWidth,
+    stroke: isSelected ? "#3b82f6" : shape.stroke || "black",
+    strokeWidth: isSelected ? 3 : shape.strokeWidth || 2,
     draggable: true,
-    onClick: () => handleShapeClick(shape.id),
+    onClick: (e: any) => {
+      e.cancelBubble = true; // Prevent event propagation
+      handleShapeClick(shape.id);
+    },
+    onDragStart: (e: any) => {
+      e.cancelBubble = true; // Prevent event propagation
+    },
     onDragMove: (e: any) => {
       handleDragMove(index, e.target.x(), e.target.y());
     },
     ref: (node: any) => {
       if (node) shapeRefs.current[shape.id] = node;
     },
+    name: shape.id,
   };
 
   switch (shape.type) {
@@ -63,41 +189,9 @@ const ShapeRenderer: React.FC<ShapeRendererProps> = ({
     case "Line":
     case "Dashed Line":
     case "Dotted Line":
-      return (
-        <Line
-          {...commonProps}
-          points={shape.points || []}
-          dash={
-            shape.type === "Dashed Line"
-              ? [10, 5]
-              : shape.type === "Dotted Line"
-                ? [2, 4]
-                : undefined
-          }
-          hitStrokeWidth={20}
-        />
-      );
     case "Directional Connector":
-      return (
-        <Arrow
-          {...commonProps}
-          points={shape.points || []}
-          pointerLength={10}
-          pointerWidth={10}
-          hitStrokeWidth={20}
-        />
-      );
     case "Bidirectional Connector":
-      return (
-        <Arrow
-          {...commonProps}
-          points={shape.points || []}
-          pointerLength={10}
-          pointerWidth={10}
-          pointerAtBeginning
-          hitStrokeWidth={20}
-        />
-      );
+      return renderConnector();
     case "Text":
       return (
         <Text
@@ -108,8 +202,7 @@ const ShapeRenderer: React.FC<ShapeRendererProps> = ({
           width={shape.width || 150}
           height={shape.height || 30}
           onDblClick={(e) => {
-            // Implement text editing logic here
-            e.cancelBubble = true; // Prevent event bubbling
+            e.cancelBubble = true;
           }}
         />
       );
@@ -124,8 +217,7 @@ const ShapeRenderer: React.FC<ShapeRendererProps> = ({
           width={shape.width || 200}
           height={shape.height || 40}
           onDblClick={(e) => {
-            // Implement text editing logic here
-            e.cancelBubble = true; // Prevent event bubbling
+            e.cancelBubble = true;
           }}
         />
       );
